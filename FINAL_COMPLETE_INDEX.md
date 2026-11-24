@@ -1,365 +1,184 @@
-# 📑 Complete IAM Learning Package — Final Index
-## Everything You Need for IAM & Security Mastery
+# IAM Learning Package: Index
 
-### 📊 Final Coverage Statistics
-- **Total Content**: ~3,600+ lines of comprehensive material
-- **Main Guide**: 974 lines (40 KB)
-- **Advanced Topics**: 700+ lines (enterprise depth)  
-- **Hands-On Labs**: 1,949 lines (80+ KB)
-- **Supporting Docs**: 8 files total
-- **Topics Covered**: 120+ distinct concepts
-- **Code Examples**: 100+ working implementations
-- **Lab Exercises**: 15+ guided projects
-- **Attack Simulations**: 10+ attack/defense scenarios
-- **Complete Systems**: 5 end-to-end implementations
-- **Assessment Questions**: 25+ evaluation points
-- **Compliance Frameworks**: Multiple (SOC2, ISO 27001)
+This index maps the IAM and security study material to its files and sections. Each topic shows where it is covered and how confident the coverage is. Items marked **Verify** have not been checked against their source file.
 
----
+## Package Contents
 
-## 🗂️ Complete File Inventory
+| File | Purpose | Status |
+|------|---------|--------|
+| `identity-zero-to-hero.md` | Main guide: foundations through intermediate implementation | Verify section coverage |
+| `ADVANCED_TOPICS.md` | Enterprise depth: cryptography, threat modeling, Kerberos, incident response, cloud IAM, SoD, federation, forensics, compliance, misconfigurations, operations | Reviewed |
+| `LABS_GUIDE.md` | Hands-on lab exercises | Verify contents |
+| `QUICK_REFERENCE.md` | Cheat sheet and troubleshooting | Verify contents |
+| `STRUCTURE_GUIDE.md` | Navigation and learning paths | Verify contents |
+| `ENHANCEMENT_SUMMARY.md` | Change record | Historical; may be removed |
+| `COMPLETE_INDEX.md` and `FINAL_COMPLETE_INDEX.md` | Earlier index versions | Superseded by this file; remove after verification |
 
-### 📚 Core Learning Materials
-
-| File | Lines | Size | Purpose |
-|------|-------|------|---------|
-| **identity-zero-to-hero.md** | 974 | 40 KB | Main comprehensive guide |
-| **ADVANCED_TOPICS.md** | 700+ | 35 KB | Enterprise-depth topics |
-| **LABS_GUIDE.md** | 1,949 | 80 KB | Complete hands-on exercises |
-
-### 📋 Supporting Documentation
-
-| File | Purpose | Read Time |
-|------|---------|-----------|
-| **QUICK_REFERENCE.md** | Fast lookup & troubleshooting | 5-10 min |
-| **STRUCTURE_GUIDE.md** | Navigation & learning paths | 10-15 min |
-| **ENHANCEMENT_SUMMARY.md** | What's been improved | 5 min |
-| **COMPLETE_INDEX.md** | Original comprehensive index | 10 min |
-| **FINAL_COMPLETE_INDEX.md** | This file - final summary | 5 min |
+Read the main guide first, then the advanced guide for depth, then the labs to practice.
 
 ---
 
-## 🎯 Complete Topic Coverage with Labs
+## Coverage by Topic
 
-### ✅ THEORY + PRACTICE MATRIX
+Each entry names the file and section that cover the topic. "Not covered" means the package does not address it.
 
-| Topic Area | Theory Coverage | Lab Exercise | Hands-On Code |
-|------------|----------------|--------------|---------------|
-| **LDAP Directory** | Sections 2, 2.1-2.10 | Lab 1.1-1.2 | Full OpenLDAP implementation |
-| **Active Directory** | Sections 3, 3.1-3.7 | Lab references | PowerShell scripts |
-| **OAuth2/OIDC** | Sections 4, 4.1-4.11 | Lab 2.1-2.2 | Complete OAuth2 server & client |
-| **RBAC & SoD** | Sections 5, 5.1-5.6 | Lab 3.1 | Full RBAC system with SQLite |
-| **Cryptography** | Advanced Topics 1 | Integrated in labs | Argon2, JWT, certificates |
-| **Authentication** | Advanced Topics 2 | All labs | MFA, FIDO2, certificates |
-| **Attack & Defense** | Advanced Topics 3, 8 | Lab 4.1 | Attack simulator & defenses |
-| **Kerberos** | Advanced Topics 4 | Lab 4 simulations | Kerberoasting simulation |
-| **Incident Response** | Advanced Topics 5 | Lab 4 forensics | Memory dumps, log analysis |
-| **Cloud IAM** | Advanced Topics 6 | References | AWS, Azure examples |
-| **Compliance** | Advanced Topics 11 | All labs | SOC2 controls embedded |
-| **Integration** | Section 6 | Lab 5 Capstone | Complete IAM platform |
+### Identity Fundamentals
+- Digital identity types, attributes, and lifecycle: main guide (Verify)
+- Identity stores and repositories: main guide (Verify)
+- Joiner, mover, leaver processes: main guide (Verify); compliance context in `ADVANCED_TOPICS.md` section 11
 
----
+### Authentication
+- Factors (knowledge, possession, inherence): main guide (Verify); `ADVANCED_TOPICS.md` section 2.3
+- Multi-factor authentication: main guide (Verify)
+- Passwordless authentication: `ADVANCED_TOPICS.md` section 2.3
+- Certificate-based authentication: `ADVANCED_TOPICS.md` section 2.1
+- FIDO2 and WebAuthn: `ADVANCED_TOPICS.md` section 2.2
+- Risk-based authentication and conditional access: `ADVANCED_TOPICS.md` section 14.1
 
-## 🧪 Lab Breakdown by Skill Level
+### Authorization
+- Access control lists and RBAC: main guide (Verify); `ADVANCED_TOPICS.md` sections 7 and 8
+- ABAC: main guide (Verify)
+- Dynamic and context-aware authorization: `ADVANCED_TOPICS.md` sections 7.2 and 8.3
+- ReBAC: not covered
 
-### 🟢 Beginner Labs (Weeks 1-2)
-1. **Lab 1.1**: Build LDAP Directory
-   - Deploy OpenLDAP with Docker
-   - Design DIT structure
-   - Create users and groups
-   - Implement security controls
-   - **Assessment**: 5 questions
+### Core Principles
+- Least privilege: `ADVANCED_TOPICS.md` sections 6 and 15
+- Separation of duties: `ADVANCED_TOPICS.md` section 7
+- Zero trust: `ADVANCED_TOPICS.md` section 14
+- Defense in depth: `ADVANCED_TOPICS.md` section 15
+- Auditability and non-repudiation: `ADVANCED_TOPICS.md` sections 3 and 10
 
-2. **Lab 1.2**: LDAP Application Integration
-   - Build Flask web app
-   - LDAP authentication
-   - Group-based permissions
-   - **Output**: Working web application
+### Directory Services
+- LDAP design, operations, filters, LDAPS, and StartTLS: main guide (Verify); `ADVANCED_TOPICS.md` sections 1.3 and 12.1
+- LDAP replication, indexing, and tuning: main guide (Verify)
+- Active Directory architecture and group nesting: main guide (Verify)
+- Kerberos protocol and attacks: `ADVANCED_TOPICS.md` section 4
+- AD misconfigurations: `ADVANCED_TOPICS.md` section 12.2
 
-### 🟡 Intermediate Labs (Weeks 3-4)
-3. **Lab 2.1**: OAuth2 Server Implementation
-   - Build authorization server from scratch
-   - Implement all OAuth2 flows
-   - JWT token generation
-   - OIDC discovery endpoints
-   - **Code**: 900+ lines Python
+### Modern IAM Protocols
+- OAuth 2.0 flows and PKCE: main guide (Verify); `ADVANCED_TOPICS.md` sections 9.4 and 12.3
+- OpenID Connect: main guide (Verify); `ADVANCED_TOPICS.md` section 9.4
+- SAML 2.0 structure and vulnerabilities: `ADVANCED_TOPICS.md` section 9
+- Token revocation and session monitoring: `ADVANCED_TOPICS.md` section 5.1
+- Cloud IAM (AWS, Microsoft Entra ID): `ADVANCED_TOPICS.md` section 6
 
-4. **Lab 2.2**: OAuth2 Client
-   - Implement client application
-   - PKCE flow
-   - Token management
-   - **Assessment**: 5 questions
+### Cryptography
+- Password hashing (Argon2id, scrypt, PBKDF2, bcrypt): `ADVANCED_TOPICS.md` section 1.1
+- Secrets at rest and key management: `ADVANCED_TOPICS.md` section 1.2
+- Certificate chains and validation: `ADVANCED_TOPICS.md` section 1.3
+- Symmetric and asymmetric cryptography: `ADVANCED_TOPICS.md` section 1.4
 
-5. **Lab 3.1**: RBAC System
-   - Complete RBAC with SQLite
-   - SoD enforcement
-   - Role hierarchies
-   - Audit logging
-   - **Code**: 400+ lines Python
+### Threat Modeling and Attacks
+- STRIDE applied to IAM: `ADVANCED_TOPICS.md` section 3.1
+- Credential spraying and directory enumeration: `ADVANCED_TOPICS.md` section 3.2
+- Kerberoasting, AS-REP roasting, Pass-the-Ticket, Golden Ticket: `ADVANCED_TOPICS.md` section 4.2
+- Privilege escalation chains: `ADVANCED_TOPICS.md` section 8
+- Silver Ticket: not covered
+- Pass-the-Hash: `ADVANCED_TOPICS.md` section 4.2 (NTLM, not Kerberos)
 
-### 🔴 Advanced Labs (Weeks 5-6)
-6. **Lab 4.1**: Security Attack Simulation
-   - Credential stuffing
-   - Password spray
-   - LDAP injection
-   - Kerberoasting
-   - Defense mechanisms
-   - **Assessment**: 5 questions
+### Cloud and Platform IAM
+- AWS IAM: `ADVANCED_TOPICS.md` section 6.1
+- Microsoft Entra ID: `ADVANCED_TOPICS.md` section 6.2
+- Kubernetes RBAC: not covered
 
-7. **Lab 5**: Capstone Project
-   - Complete IAM platform
-   - Docker Compose stack
-   - Integration of all components
-   - Production deployment
-   - **Requirements**: 8 components
+### Incident Response and Forensics
+- Compromise indicators: `ADVANCED_TOPICS.md` section 5.1
+- Evidence preservation: `ADVANCED_TOPICS.md` section 5.2
+- Log analysis: `ADVANCED_TOPICS.md` section 10
+- Failed-bind playbook: `ADVANCED_TOPICS.md` section 13.2
 
----
+### Compliance
+- SOC 2 criteria mapped to IAM: `ADVANCED_TOPICS.md` section 11.1
+- Audit evidence checklist: `ADVANCED_TOPICS.md` section 11.2
+- ISO 27001, NIST SP 800-63B, GDPR, PCI DSS: not covered in depth; use the source standards
 
-## 📈 Learning Path with Labs
+### Operations
+- Monitoring metrics and alert thresholds: `ADVANCED_TOPICS.md` section 13.1
+- Misconfigurations (LDAP, AD, OAuth 2.0/OIDC): `ADVANCED_TOPICS.md` section 12
+- Hardening and disaster recovery: main guide (Verify)
 
-### Month 1: Foundations + LDAP
-- **Week 1-2**: Section 1 (Foundations) + Setup lab environment
-- **Week 3**: Section 2 (LDAP) + Lab 1.1 (Build LDAP)
-- **Week 4**: Lab 1.2 (LDAP Integration) + Security audit
-
-### Month 2: Modern IAM
-- **Week 1**: Section 4 (OAuth2/OIDC theory)
-- **Week 2**: Lab 2.1 (Build OAuth2 server)
-- **Week 3**: Lab 2.2 (OAuth2 client) + Token management
-- **Week 4**: Integration testing
-
-### Month 3: Access Control
-- **Week 1**: Section 5 (RBAC theory)
-- **Week 2**: Lab 3.1 (Build RBAC system)
-- **Week 3**: SoD implementation + testing
-- **Week 4**: Audit and compliance
-
-### Month 4: Security
-- **Week 1-2**: Advanced Topics (Cryptography, Threats)
-- **Week 3**: Lab 4.1 (Attack simulations)
-- **Week 4**: Defense implementations
-
-### Month 5: Cloud & Advanced
-- **Week 1**: Cloud IAM platforms (AWS, Azure)
-- **Week 2**: Kerberos deep dive
-- **Week 3**: Federation and trust
-- **Week 4**: Incident response procedures
-
-### Month 6: Mastery
-- **Week 1-2**: Lab 5 (Capstone project)
-- **Week 3**: Production deployment
-- **Week 4**: Assessment and certification
+### Emerging Topics
+- Compromised MFA and help-desk social engineering: `ADVANCED_TOPICS.md` section 14.1
+- Directory supply chain risks: `ADVANCED_TOPICS.md` section 14.2
+- Decentralized identity, post-quantum cryptography, behavioral biometrics: not covered
 
 ---
 
-## ✅ Skills Validation Checklist
+## Labs
 
-### Theoretical Knowledge
-- [ ] Can explain all IAM concepts (Section 1)
-- [ ] Understands LDAP architecture (Section 2)
-- [ ] Knows OAuth2/OIDC flows (Section 4)
-- [ ] Can design RBAC systems (Section 5)
-- [ ] Understands cryptography (Advanced Topics 1)
-- [ ] Knows attack patterns (Advanced Topics 3)
-
-### Practical Skills (Lab Validated)
-- [ ] **Lab 1**: Built and secured LDAP directory
-- [ ] **Lab 1**: Integrated LDAP with application
-- [ ] **Lab 2**: Implemented OAuth2 server
-- [ ] **Lab 2**: Built OAuth2 client with PKCE
-- [ ] **Lab 3**: Created RBAC system with SoD
-- [ ] **Lab 4**: Simulated and defended attacks
-- [ ] **Lab 5**: Deployed complete IAM system
-
-### Production Readiness
-- [ ] Can troubleshoot issues (Section 9)
-- [ ] Follows security checklists (Section 10)
-- [ ] Implements monitoring (Lab 5)
-- [ ] Documents decisions (All labs)
-- [ ] Handles incidents (Advanced Topics 5)
+`LABS_GUIDE.md` is listed as containing hands-on exercises. Its contents were not reviewed here, so do not rely on its lab count, scoring rubric, or time estimates until you have checked them. If you keep a scoring rubric, state it as a self-assessment guide, not a certification.
 
 ---
 
-## 🏆 Assessment & Certification Path
+## Study Plan (Suggested)
 
-### Lab Scoring (100 points total)
-| Lab | Points | Pass Score |
-|-----|--------|------------|
-| Lab 1 (LDAP) | 20 | 16 |
-| Lab 2 (OAuth2) | 20 | 16 |
-| Lab 3 (RBAC) | 20 | 16 |
-| Lab 4 (Security) | 20 | 16 |
-| Lab 5 (Capstone) | 20 | 16 |
-| **Total** | **100** | **80** |
+This plan is a starting point. Adjust it to your schedule and to the sections you have verified.
 
-### Certification Levels
-- **90-100**: IAM Engineer (Expert)
-- **80-89**: IAM Specialist (Proficient)
-- **70-79**: IAM Practitioner (Competent)
-- **60-69**: IAM Associate (Developing)
-- **<60**: Continue studying
+**Month 1: Foundations**
+- Weeks 1-2: Main guide, foundations
+- Week 3: LDAP or Active Directory, whichever is more relevant to your internship
+- Week 4: `ADVANCED_TOPICS.md` sections 1 to 3
 
----
+**Month 2: Modern IAM**
+- Weeks 1-2: OAuth 2.0, OIDC, and SAML (main guide and `ADVANCED_TOPICS.md` section 9)
+- Week 3: RBAC and SoD (`ADVANCED_TOPICS.md` sections 7 and 8)
+- Week 4: Labs on OAuth 2.0 and RBAC, if `LABS_GUIDE.md` covers them
 
-## 🚀 What You Can Build After Completion
+**Month 3: Cloud and Security**
+- Week 1: Cloud IAM (`ADVANCED_TOPICS.md` section 6)
+- Week 2: Threat modeling (`ADVANCED_TOPICS.md` section 3)
+- Week 3: Incident response and forensics (`ADVANCED_TOPICS.md` sections 5 and 10)
+- Week 4: Compliance (`ADVANCED_TOPICS.md` section 11)
 
-### With Lab 1 Skills
-- Enterprise LDAP directory
-- Centralized authentication system
-- Linux/Unix identity management
-- Application LDAP integration
+**Month 4: Advanced Topics**
+- Weeks 1-2: Kerberos (`ADVANCED_TOPICS.md` section 4)
+- Week 3: Privilege escalation and dynamic SoD (`ADVANCED_TOPICS.md` sections 7.2 and 8)
+- Week 4: Federation and trust (`ADVANCED_TOPICS.md` section 9)
 
-### With Lab 2 Skills
-- OAuth2 authorization server
-- OIDC identity provider
-- Token-based API security
-- SSO implementation
+**Month 5: Operations**
+- Week 1: Monitoring and alerting (`ADVANCED_TOPICS.md` section 13)
+- Week 2: Misconfigurations (`ADVANCED_TOPICS.md` section 12)
+- Week 3: Hardening (main guide, verify)
+- Week 4: Troubleshooting practice
 
-### With Lab 3 Skills
-- Enterprise RBAC system
-- SoD enforcement platform
-- Audit and compliance system
-- Permission management service
-
-### With Lab 4 Skills
-- Security monitoring system
-- Attack detection platform
-- Incident response tools
-- Penetration testing scenarios
-
-### With Lab 5 Skills
-- Complete IAM platform
-- Multi-protocol identity system
-- Production-ready deployment
-- Enterprise architecture
+**Month 6: Practice**
+- Weeks 1-2: Build a lab with OpenLDAP, Active Directory (or a test domain), and an OIDC provider
+- Week 3: Assess the lab for misconfigurations you are authorized to test
+- Week 4: Write up findings and recommendations
 
 ---
 
-## 📊 Time Investment Summary
+## Self-Assessment
 
-### Theory Learning
-- **Main Guide**: 40-60 hours
-- **Advanced Topics**: 20-30 hours
-- **Total Theory**: 60-90 hours
+**Explain without notes**
+- [ ] Identity, authentication, and authorization, and how they differ
+- [ ] When to use each authentication factor
+- [ ] LDAP versus Active Directory
+- [ ] OAuth 2.0, OIDC, and SAML, and the problem each solves
+- [ ] Static and dynamic SoD, with an example of each
+- [ ] Common attacks on identity systems and their mitigations
 
-### Practical Labs
-- **Lab Setup**: 2-4 hours
-- **Lab 1**: 8-10 hours
-- **Lab 2**: 10-12 hours
-- **Lab 3**: 8-10 hours
-- **Lab 4**: 6-8 hours
-- **Lab 5**: 20-30 hours
-- **Total Labs**: 54-74 hours
+**Hands-on**
+- [ ] Configure an LDAP server with TLS
+- [ ] Query and modify directory entries
+- [ ] Implement an OAuth 2.0 authorization code flow with PKCE
+- [ ] Design a role hierarchy with SoD constraints
+- [ ] Identify a password spray in authentication logs
+- [ ] Find misconfigurations in a directory or OAuth client
 
-### Complete Program
-- **Minimum**: 114 hours (3 weeks full-time)
-- **Recommended**: 164 hours (1 month full-time, 6 months part-time)
-- **Mastery**: 200+ hours with practice
-
----
-
-## 🎯 Internship Readiness Metrics
-
-### You're Ready When You Can:
-
-**Technical Demonstrations**
-- ✅ Deploy secure LDAP directory (Lab 1)
-- ✅ Implement OAuth2 flow (Lab 2)
-- ✅ Build RBAC with SoD (Lab 3)
-- ✅ Detect and prevent attacks (Lab 4)
-- ✅ Design complete IAM system (Lab 5)
-
-**Conceptual Explanations**
-- ✅ Explain AuthN vs AuthZ
-- ✅ Describe Zero Trust principles
-- ✅ Compare LDAP vs AD vs Cloud IAM
-- ✅ Discuss token vs session auth
-- ✅ Articulate security threats
-
-**Problem Solving**
-- ✅ Debug authentication issues
-- ✅ Troubleshoot authorization problems
-- ✅ Investigate security incidents
-- ✅ Design scalable solutions
-- ✅ Implement compliance controls
+**Professional**
+- [ ] Explain compliance requirements in plain language
+- [ ] Document technical findings clearly
+- [ ] Escalate issues appropriately
+- [ ] Follow change management procedures
+- [ ] Test security only on systems you are authorized to test
 
 ---
 
-## 📚 Quick Navigation Guide
+## Notes
 
-### "I want to learn X"
-- **LDAP**: Guide Section 2 + Lab 1
-- **OAuth2**: Guide Section 4 + Lab 2
-- **RBAC**: Guide Section 5 + Lab 3
-- **Security**: Advanced Topics 3 + Lab 4
-- **Everything**: Start with Lab 5 requirements
+- Commands and code in the guides are illustrative. Test them in a lab before running them anywhere else.
+- This package does not replace vendor documentation or the standards it cites (NIST SP 800-63B, RFC 9106, RFC 6749, OWASP guidance).
+- Remove superseded index files (`COMPLETE_INDEX.md`, `FINAL_COMPLETE_INDEX.md`) once this file is confirmed.
 
-### "I need to fix X"
-- **Authentication issues**: Section 9.1-9.2
-- **Authorization problems**: Section 9.4
-- **Performance issues**: Sections 2.5, 3.5
-- **Security vulnerabilities**: Advanced Topics 12
-- **Integration problems**: Section 6
-
-### "I want to build X"
-- **SSO system**: Lab 2 + Section 4
-- **Directory service**: Lab 1 + Section 2/3
-- **Access control**: Lab 3 + Section 5
-- **Security monitoring**: Lab 4 + Advanced Topics 13
-- **Complete platform**: Lab 5 (Capstone)
-
----
-
-## ✅ Final Verification Checklist
-
-### Documents Present
-- [x] identity-zero-to-hero.md (Main guide)
-- [x] ADVANCED_TOPICS.md (Deep enterprise topics)
-- [x] LABS_GUIDE.md (Complete hands-on labs)
-- [x] QUICK_REFERENCE.md (Fast lookup)
-- [x] STRUCTURE_GUIDE.md (Navigation)
-- [x] ENHANCEMENT_SUMMARY.md (Changes)
-- [x] COMPLETE_INDEX.md (Original index)
-- [x] FINAL_COMPLETE_INDEX.md (This summary)
-
-### Coverage Verification
-- [x] All IAM concepts covered in theory
-- [x] Every topic has practical lab exercise
-- [x] Attack scenarios included
-- [x] Defense mechanisms implemented
-- [x] Complete systems buildable
-- [x] Assessment questions provided
-- [x] Certification path defined
-
----
-
-## 🎉 Congratulations!
-
-You now have:
-- **3,600+ lines** of comprehensive IAM content
-- **15+ hands-on labs** with working code
-- **100+ code examples** you can run
-- **Complete learning path** from zero to expert
-- **Production-ready** knowledge and skills
-
-### Your Journey
-1. **Start**: QUICK_REFERENCE.md (10 min orientation)
-2. **Learn**: Section 1 of main guide (foundations)
-3. **Practice**: Lab 1 (build your first directory)
-4. **Master**: Complete all labs with 80%+ score
-5. **Deploy**: Build production IAM system
-
-### Success Metrics
-- **After 1 month**: Understand all concepts, complete 2 labs
-- **After 3 months**: Complete all intermediate labs
-- **After 6 months**: Ready for IAM engineering role
-
----
-
-**Status**: ✅ COMPLETE - Comprehensive theory + extensive practice
-**Depth**: Maximum - suitable for enterprise roles
-**Gaps**: None - all aspects covered with labs
-
-*Package Version: 2.0 - Theory + Practice Complete*
-*Created: 2024-10-31*
-*Ready for: IAM/Security Internship & Professional Roles*
+*Last reviewed: 2026-11-24*
