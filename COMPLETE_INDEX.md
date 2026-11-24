@@ -1,4 +1,3 @@
-```markdown
 # IAM Learning Index
 
 Index of the IAM and security study material, with an honest coverage status for each topic.
@@ -198,4 +197,3 @@ Status key:
 ---
 
 *Last reviewed: 2026-11-24*
-```
