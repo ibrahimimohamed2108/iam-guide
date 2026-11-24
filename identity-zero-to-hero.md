@@ -1,161 +1,169 @@
-# Identity, Directory, and Access Management — Zero to Hero
-## Complete Guide to AD, LDAP, IAM, and RBAC
+# Identity, Directory, and Access Management: Foundations to Operations
 
-A comprehensive, hands-on guide from fundamentals to production-ready implementations. Designed for security engineers, system administrators, and developers who need to master identity and access management from the ground up.
+A guide to Active Directory, LDAP, IAM, and RBAC, from core concepts to operational practice. It is written for security engineers, system administrators, and developers who work with identity systems.
 
-### 📋 What You'll Learn
-- Master the fundamentals of identity, authentication, and authorization
-- Design and implement LDAP directories and Active Directory infrastructures
-- Build modern IAM systems with OAuth2, OIDC, and SAML
-- Engineer robust RBAC systems with proper governance
-- Secure enterprise environments with best practices
-- Troubleshoot complex identity and access issues
+## What You Will Learn
 
-### 🎯 Target Audience
-- **Beginners**: Start with Section 1 (Foundations) and work through linearly
-- **Practitioners**: Jump to specific sections based on your needs
-- **Architects**: Focus on Sections 6-8 for design patterns and governance
+- Identity, authentication, and authorization, and how they differ
+- Designing LDAP directories and Active Directory (AD) environments
+- Modern authentication with OAuth 2.0, OpenID Connect (OIDC), and SAML
+- Engineering RBAC with separation of duties (SoD) and governance
+- Hardening identity infrastructure
+- Troubleshooting identity and access problems
 
-### 📖 Table of Contents
-1. **[Foundations](#1-foundations)** - Core concepts and principles
-2. **[LDAP Mastery](#2-ldap--zero-to-hero)** - OpenLDAP implementation and operations
-3. **[Active Directory](#3-active-directory-ad--zero-to-hero)** - Windows AD design and management
-4. **[Modern IAM](#4-iam--zero-to-hero)** - OAuth2, OIDC, SAML, and token-based auth
-5. **[RBAC Engineering](#5-rbac--zero-to-hero)** - Role-based access control design
-6. **[Integration Patterns](#6-crosswalk-mapping-ad-ldap-iam-rbac)** - Connecting different systems
-7. **[Reference Architectures](#7-blueprints-reference-architectures)** - Production-ready designs
-8. **[Security & Compliance](#8-security-compliance-and-governance)** - Hardening and governance
-9. **[Troubleshooting](#9-troubleshooting-playbooks)** - Common issues and solutions
-10. **[Operations](#10-checklists-and-runbooks)** - Checklists and procedures
-11. **[Glossary](#11-glossary)** - Terms and definitions
-12. **[Resources](#12-further-reading)** - Additional learning materials
+## Target Audience
 
---------------------------------------------------------------------------------
+- **Beginners:** start with Section 1 and read in order.
+- **Practitioners:** jump to the section that matches your task.
+- **Architects:** focus on Sections 6 to 8 for design patterns and governance.
 
-## 0) How to use this guide
+## Table of Contents
 
-- Read “Foundations,” then pick a track (LDAP or AD) to build a directory quickly.
-- Add IAM for SSO and token-based auth to apps and APIs.
+1. [Foundations](#1-foundations)
+2. [LDAP](#2-ldap)
+3. [Active Directory](#3-active-directory)
+4. [Modern IAM](#4-modern-iam)
+5. [RBAC Engineering](#5-rbac-engineering)
+6. [Integration Patterns](#6-integration-patterns)
+7. [Reference Architectures](#7-reference-architectures)
+8. [Security, Compliance, and Governance](#8-security-compliance-and-governance)
+9. [Troubleshooting Playbooks](#9-troubleshooting-playbooks)
+10. [Operations: Checklists and Runbooks](#10-operations-checklists-and-runbooks)
+11. [Glossary](#11-glossary)
+12. [Further Reading](#12-further-reading)
+
+---
+
+## 0. How to Use This Guide
+
+- Read Section 1, then choose a track: LDAP (Linux-focused environments) or AD (Windows-focused environments).
+- Add IAM for single sign-on and token-based access to applications and APIs.
 - Implement RBAC to standardize authorization across systems.
-- Complete the “Exercises” in each section to reach “Hero” level.
+- Complete the exercises at the end of each section.
 
-Learning outcomes
-- Distinguish identity, directory, and IAM roles and where RBAC fits.
-- Design directory structures (DIT/OUs), groups, and policies.
-- Implement secure authentication (Kerberos, LDAP bind, OIDC/OAuth2).
+Examples in this guide are illustrative. Policy documents, JSON, and tokens show structure and are not complete product configurations. Test every command in a lab before you run it against a production system.
+
+**Learning outcomes**
+
+- Distinguish identity, directory, and IAM, and place RBAC within them.
+- Design directory structures (DIT and OUs), groups, and policies.
+- Implement secure authentication with Kerberos, LDAP bind, and OIDC/OAuth 2.0.
 - Engineer roles and permissions for least privilege and auditability.
 
---------------------------------------------------------------------------------
+---
 
-## 1. Foundations: Identity, AuthN, AuthZ, Directory, and Policy
+## 1. Foundations
 
-### 1.1 Core Concepts Explained
+### 1.1 Core Concepts
 
 #### 1.1.1 Identity
-**Definition**: A digital representation of an actor (user, service, device, or application) within a system.
 
-**Key Points**:
-- Every identity must be **unique** and **identifiable** within an organization
-- Identities have **attributes** (email, department, role, clearance level)
-- Identities can be **human** (users) or **non-human** (service accounts, workload identities)
-- Examples:
-  - User: `john.doe@example.com` (employee identity)
-  - Service: `api-processor@corp` (API service account)
-  - Device: `LAPTOP-ABC123` (workstation identity)
-  - Workload: `kubernetes-deployer` (CI/CD pipeline identity)
+**Definition:** a digital representation of an actor (user, service, device, or application) within a system.
 
-**Why it matters**: Identity is the foundation of all security decisions. Without accurate identity, you cannot properly authenticate or authorize access.
+- Each identity must be unique and identifiable within the organization.
+- Identities carry attributes such as email, department, role, and clearance level.
+- Identities can be human (users) or non-human (service accounts, workload identities).
 
-#### 1.1.2 Authentication (AuthN) — Proving Who You Are
-**Definition**: The process of verifying that an identity is genuine through **proof of knowledge, possession, or inherence**.
+Examples:
 
-**Authentication Factors**:
-- **Knowledge**: Something you know (password, PIN, security questions)
-- **Possession**: Something you have (hardware token, phone, cryptographic key)
-- **Inherence**: Something you are (biometric: fingerprint, face recognition)
-- **Location/Context**: Where you are, what time, from what network
+- User: `john.doe@example.com`
+- Service: `api-processor@corp`
+- Device: `LAPTOP-ABC123`
+- Workload: a CI/CD pipeline identity
 
-**Authentication Methods**:
-| Method | Strength | Use Case |
-|--------|----------|----------|
-| Password | Low | Legacy systems, convenience |
-| Multi-Factor (MFA) | Medium | Standard security baseline |
-| Passwordless (FIDO2) | High | Admin access, sensitive systems |
+Identity is the basis of every security decision. Without accurate identity, authentication and authorization cannot be trusted.
+
+#### 1.1.2 Authentication (AuthN): Proving Who You Are
+
+**Definition:** verifying that an identity is genuine, using proof of knowledge, possession, or inherence.
+
+Authentication factors:
+
+- **Knowledge:** something you know (password, PIN)
+- **Possession:** something you have (hardware token, phone, cryptographic key)
+- **Inherence:** something you are (fingerprint, face)
+- **Context:** where you are, when, and from what network (used as a risk signal, never as a sole factor)
+
+| Method | Strength | Typical use |
+|--------|----------|-------------|
+| Password | Low | Legacy systems |
+| Multi-factor (MFA) | Medium | Standard baseline |
+| Passwordless (FIDO2/WebAuthn) | High | Administrative and sensitive access |
 | Certificate | High | System-to-system authentication |
-| OAuth2/OIDC | Medium | Third-party integrations |
-| Kerberos | High | Enterprise directory-based |
+| OAuth 2.0 / OIDC | Medium | Third-party integrations |
+| Kerberos | High | Enterprise directory-based login |
 
-**Modern Best Practice**: Passwordless authentication (FIDO2/WebAuthn) is preferred for high-security scenarios; MFA is the minimum baseline for sensitive systems.
+MFA is the minimum baseline for sensitive systems. Phishing-resistant methods such as FIDO2 are preferred for administrative access.
 
-#### 1.1.3 Authorization (AuthZ) — Deciding What You Can Do
-**Definition**: The process of determining **what authenticated identities are allowed to do** after their identity has been verified.
+#### 1.1.3 Authorization (AuthZ): Deciding What You Can Do
 
-**Authorization is NOT Authentication**:
-- Authentication: "Are you John Doe?" → Yes/No
-- Authorization: "Can John Doe read file X and delete resource Y?" → Yes/No for each action
+**Definition:** determining what an authenticated identity may do.
 
-**Authorization Models**:
-- **Access Control List (ACL)**: Explicit list of who can access what (traditional)
-- **Role-Based (RBAC)**: User has role(s) → Role has permission(s)
-- **Attribute-Based (ABAC)**: Complex rules based on user, resource, and environmental attributes
-- **Relationship-Based (ReBAC)**: Permissions based on graph relationships ("who is related to whom")
+Authentication answers "Are you John Doe?" Authorization answers "May John Doe read file X and delete resource Y?"
 
-**Example Flow**:
-```
-User: john.doe@example.com
-Seeking: Read access to /data/financials/budget-2024.xlsx
+Authorization models:
 
-Authorization Check:
-1. Is john.doe authenticated? ✓ Yes
-2. Does john.doe have role "Finance_Analyst"? ✓ Yes
-3. Does role "Finance_Analyst" have permission "read:budget_data"? ✓ Yes
-4. Is the request from 9-5 AM on business day? ✓ Yes
-5. Decision: ALLOW
+- **Access control list (ACL):** an explicit list of who can access what.
+- **Role-based (RBAC):** a user holds roles, and roles hold permissions.
+- **Attribute-based (ABAC):** rules evaluate user, resource, and environment attributes.
+- **Relationship-based (ReBAC):** permissions follow relationships in a graph, such as "member of a team that owns this document."
+
+Example evaluation:
+
+```text
+User:    john.doe@example.com
+Request: read /data/financials/budget-2024.xlsx
+
+1. Is john.doe authenticated?                 Yes
+2. Does john.doe hold role Finance_Analyst?   Yes
+3. Does that role grant read:budget_data?     Yes
+4. Does the request meet time and device policy? Yes
+Decision: ALLOW
 ```
 
 #### 1.1.4 Directory Services
-**Definition**: A centralized, hierarchical database that stores **identities, attributes, and group memberships** in a standardized format.
 
-**Directory Types**:
-| Type | Primary Use | Protocol | Hierarchy |
-|------|-----------|----------|----------|
-| **Active Directory (AD)** | Windows enterprise | Kerberos, LDAP, NTLM | Forest/Domain/OU |
-| **OpenLDAP** | Linux/Unix, open-source | LDAP, LDAPS | DIT (Directory Information Tree) |
-| **FreeIPA** | Linux infrastructure | LDAP, Kerberos, HTTP | Realm/Domains |
-| **Okta/Azure AD** | Cloud-native, SaaS | OAuth2, OIDC, SAML | Tenant/Directories |
+**Definition:** a hierarchical store of identities, attributes, and group memberships in a standardized format.
 
-**Core Functions**:
-1. **Identity Storage**: Centralized database of users and devices
-2. **Group Management**: Organize identities for permission delegation
-3. **Authentication**: Provide login services (passwords, Kerberos)
-4. **Authorization**: Store group memberships and entitlements
-5. **Schema**: Define what attributes can be stored (email, phone, role)
+| Type | Primary use | Protocols | Hierarchy |
+|------|-------------|-----------|-----------|
+| Active Directory (AD) | Windows enterprise | Kerberos, LDAP, NTLM | Forest, domain, OU |
+| OpenLDAP | Linux and Unix, open source | LDAP, LDAPS | Directory Information Tree (DIT) |
+| FreeIPA | Linux infrastructure | LDAP, Kerberos, HTTP | Realm and domains |
+| Okta, Microsoft Entra ID | Cloud and SaaS | OAuth 2.0, OIDC, SAML | Tenant and directories |
 
-**Directory as Source of Truth**:
-- Single source of truth for identity across the organization
-- Changes replicate to all connected systems
-- Enables centralized auditing and compliance
+Core functions:
+
+1. Store identities and devices.
+2. Manage groups for permission delegation.
+3. Provide authentication services (passwords, Kerberos).
+4. Store group memberships and entitlements.
+5. Define the schema for stored attributes.
+
+The directory should act as the source of truth for identity. Changes replicate to connected systems, which makes centralized auditing possible.
 
 #### 1.1.5 Policy
-**Definition**: **Machine-evaluable rules** that determine what is allowed or denied for authentication and authorization.
 
-**Types of Policies**:
-- **Authentication Policies**: Require MFA at 3 AM, block legacy protocols
-- **Authorization Policies**: Allow read access on "public" resources, deny write
-- **Compliance Policies**: Enforce encryption, password complexity, data retention
-- **Access Policies**: Conditional rules (e.g., "Only from corporate network")
+**Definition:** machine-evaluable rules that allow or deny authentication and authorization decisions.
 
-**Policy Example**:
+Policy types:
+
+- **Authentication:** require MFA for administrators, block legacy protocols.
+- **Authorization:** allow read on public resources, deny write.
+- **Compliance:** enforce encryption, password complexity, and retention.
+- **Access:** conditional rules such as "only from the corporate network."
+
+Illustrative policy (pseudo-format, not a product schema):
+
 ```json
 {
-  "policy_id": "corporate_api_access",
-  "description": "Grant API access to developers",
+  "policy_id": "developer_api_access",
+  "description": "Developers may call the internal API",
   "conditions": {
-    "user_role": "developer",
+    "role": "developer",
     "mfa_verified": true,
     "device_compliant": true,
-    "network_location": ["office", "vpn"],
-    "time_window": "09:00-17:00 business days"
+    "network": ["office", "vpn"]
   },
   "effect": "allow",
   "resources": ["api.example.com/*"],
@@ -164,231 +172,225 @@ Authorization Check:
 ```
 
 #### 1.1.6 Governance
-**Definition**: The **lifecycle management and oversight** of identities, access, and compliance throughout an organization.
 
-**Key Governance Processes**:
-1. **Joiners**: New employee onboarding → Create identity, assign roles, provision access
-2. **Movers**: Role change or transfer → Update attributes, revoke old roles, grant new roles
-3. **Leavers**: Employee departure → Disable account, revoke all access, archive data
-4. **Access Reviews**: Quarterly/annual verification that access is still appropriate
-5. **Compliance**: Audit trails, SoD enforcement, policy violations
-6. **Exception Handling**: Emergency access, temporary elevated privileges
+**Definition:** lifecycle management and oversight of identities, access, and compliance.
 
-**Governance Metrics**:
-- Onboarding time from hire to productive access
-- Offboarding completion time and verification
-- Stale account detection and removal
+Key processes:
+
+1. **Joiners:** create the identity, assign roles, provision access.
+2. **Movers:** on a role change, update attributes, revoke old roles, grant new ones.
+3. **Leavers:** disable the account, revoke access, archive data.
+4. **Access reviews:** periodically confirm that access remains appropriate.
+5. **Compliance:** keep audit trails, enforce SoD, track policy violations.
+6. **Exceptions:** handle emergency access and temporary elevation with approval and expiry.
+
+Useful governance metrics:
+
+- Time from hire to productive access
+- Time to complete offboarding, and verification that it happened
+- Number of stale accounts detected and removed
 - Access review completion rate and findings
-- SoD conflict detection and remediation time
+- Time to detect and remediate SoD conflicts
 
 ### 1.2 Core Principles
 
-#### 1.2.1 Least Privilege (PoLP — Principle of Least Privilege)
-**Definition**: Grant users the **minimum access required** to perform their job function, nothing more.
+#### 1.2.1 Least Privilege
 
-**Implementation**:
-```
-Wrong:  "John is finance, give him all finance group access"
-Right:  "John needs to approve invoices in system X, grant: approver role on invoice queue only"
+Grant the minimum access needed for the job.
+
+```text
+Weak:   "John is in Finance, so give him the whole Finance group."
+Better: "John approves invoices in system X, so grant the approver role on the invoice queue only."
 ```
 
-**Benefits**:
-- Limits blast radius of credential compromise
-- Reduces attack surface
-- Improves auditability
-- Easier compliance demonstration
+Benefits: smaller blast radius for a stolen credential, smaller attack surface, simpler audits.
 
 #### 1.2.2 Separation of Duties (SoD)
-**Definition**: Distribute critical tasks so that **no single person can approve and execute** a sensitive action.
 
-**Examples**:
-- Payment Requester ≠ Payment Approver
-- Code Author ≠ Code Reviewer (in CI/CD)
-- Access Granter ≠ Access Recipient (for sensitive roles)
-- Auditor cannot modify audit logs
+No single person should be able to both initiate and approve a sensitive action.
 
-**Implementation**:
-- Preventive: Automatically block conflicting role assignments
-- Detective: Alert when SoD violations are detected
-- Corrective: Policies requiring manual review for exceptions
+Examples:
+
+- Payment requester and payment approver must be different people.
+- Code author and code reviewer must be different people.
+- Access granter and access recipient must be different people for sensitive roles.
+- Auditors must not be able to modify the audit logs they review.
+
+Controls:
+
+- **Preventive:** block conflicting role assignments automatically.
+- **Detective:** alert when a conflict exists.
+- **Corrective:** require manual review for approved exceptions.
 
 #### 1.2.3 Zero Trust
-**Definition**: **Never trust, always verify**. Every request is treated as untrusted regardless of source.
 
-**Zero Trust Pillars**:
-1. **Continuous Verification**: Re-authenticate and re-authorize on every request
-2. **Device Posture**: Ensure device is compliant (patched, encrypted, MDM-enrolled)
-3. **Network Context**: Evaluate network location, IP reputation, VPN status
-4. **Behavioral Analytics**: Detect anomalies (impossible travel, unusual resource access)
-5. **Microsegmentation**: Network isolation between systems
+Never trust, always verify. Treat every request as untrusted until it is verified, regardless of where it originates.
 
-**Zero Trust IAM Implementation**:
-- Passwordless or MFA-enforced authentication
-- Token-based (short-lived) rather than session-based
-- Conditional access policies based on risk signals
-- Continuous monitoring and revocation of compromised tokens
+Pillars:
+
+1. **Continuous verification:** re-check identity and authorization on each sensitive request.
+2. **Device posture:** confirm the device is patched, encrypted, and managed.
+3. **Network context:** evaluate location and VPN status as signals.
+4. **Behavioral analytics:** detect anomalies such as impossible travel.
+5. **Microsegmentation:** isolate systems from one another.
+
+Zero trust IAM uses MFA or passwordless authentication, short-lived tokens, conditional access driven by risk signals, and prompt revocation of compromised sessions.
 
 #### 1.2.4 Auditability
-**Definition**: **All identity and access decisions must be logged, traceable, and reviewable**.
 
-**What to Log**:
-```
-✓ Authentication events (success, failure, method)
-✓ Authorization decisions (allow/deny, policy evaluated)
-✓ Group membership changes (who added, when, why)
-✓ Privilege elevation (who elevated, duration, action taken)
-✓ Configuration changes (policy updates, role definitions)
-✓ Data access (who accessed what, when, what actions)
-```
+Every identity and access decision should be logged, traceable, and reviewable.
 
-**Audit Trail Requirements**:
-- **Immutable**: Cannot be modified after creation
-- **Complete**: All relevant details captured
-- **Linked**: Connected to ticket systems and change requests
-- **Accessible**: Searchable and analyzable
-- **Retained**: Per compliance requirements (often 1-7 years)
+Log at minimum:
+
+- Authentication events (success, failure, method used)
+- Authorization decisions (allow or deny, and the policy applied)
+- Group membership changes (who, when, and the approving ticket)
+- Privilege elevation (who, how long, what was done)
+- Configuration changes to policies and roles
+- Access to sensitive data (who, what, when, which actions)
+
+Audit trail requirements:
+
+- **Immutable:** protected against modification after creation, including by administrators.
+- **Complete:** every relevant detail captured.
+- **Linked:** tied to tickets and change requests.
+- **Searchable:** usable for investigation.
+- **Retained:** kept for the period required by applicable regulation, which varies by jurisdiction and sector.
 
 #### 1.2.5 Automation
-**Definition**: Use **rules and workflows** to enforce identity and access policies without manual intervention.
 
-**Automation Opportunities**:
-- **Provisioning**: HR system → Directory entry creation
-- **Deprovisioning**: Termination date → Automatic access revocation
-- **Recertification**: Scheduled role review campaigns
-- **Policy Enforcement**: SoD conflict detection → Alert/block
-- **Token Management**: Automatic rotation and expiration
+Enforce identity policy through rules and workflows instead of manual steps.
 
-**Benefits**:
-- Reduces human error
-- Enforces consistency
-- Enables audit trails
-- Frees teams for strategic work
+- **Provisioning:** HR system creates directory entries.
+- **Deprovisioning:** termination date triggers access revocation.
+- **Recertification:** scheduled access review campaigns.
+- **Policy enforcement:** SoD conflict detection triggers an alert or blocks the change.
+- **Token management:** automatic rotation and expiry.
 
-### 1.3 Mental Model: How It All Connects
+Automation reduces human error, enforces consistency, and produces audit evidence.
 
-#### 1.3.1 The Identity Architecture Layer Cake
+### 1.3 How the Pieces Connect
 
-```
-┌─────────────────────────────────────────┐
-│  Application Layer                      │
-│  (What the user can do)                 │
-├─────────────────────────────────────────┤
-│  Authorization Layer (RBAC/ABAC)        │
-│  Roles → Permissions → Resources        │
-├─────────────────────────────────────────┤
-│  Token Layer (OIDC/OAuth2/SAML)         │
-│  Issues and validates security tokens   │
-├─────────────────────────────────────────┤
-│  IAM Layer                              │
-│  MFA, Conditional Access, Governance    │
-├─────────────────────────────────────────┤
-│  Authentication Layer                   │
-│  Verifies identity (Password/Cert/etc)  │
-├─────────────────────────────────────────┤
-│  Directory Layer (AD/LDAP)              │
-│  Stores identities and groups           │
-├─────────────────────────────────────────┤
-│  Infrastructure Layer                   │
-│  Network, encryption, hardware security │
-└─────────────────────────────────────────┘
+#### 1.3.1 Layered View
+
+```text
++-----------------------------------------+
+| Application layer                       |
+| (what the user can do in the app)       |
++-----------------------------------------+
+| Authorization layer (RBAC / ABAC)       |
+| Roles -> permissions -> resources       |
++-----------------------------------------+
+| Token layer (OIDC / OAuth 2.0 / SAML)   |
+| Issues and validates tokens             |
++-----------------------------------------+
+| IAM layer                               |
+| MFA, conditional access, governance     |
++-----------------------------------------+
+| Authentication layer                    |
+| Verifies identity (password, cert, ...) |
++-----------------------------------------+
+| Directory layer (AD / LDAP)             |
+| Stores identities and groups            |
++-----------------------------------------+
+| Infrastructure layer                    |
+| Network, encryption, hardware security  |
++-----------------------------------------+
 ```
 
-#### 1.3.2 Data Flow Example: Employee Accessing Sensitive Resource
+#### 1.3.2 Example: Employee Accesses a Sensitive Resource
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ SCENARIO: John Doe requests access to /data/financials         │
-└─────────────────────────────────────────────────────────────────┘
+```text
+Scenario: John Doe requests read access to /data/financials
 
 1. IDENTITY
-   ├─ Directory contains: john.doe with attributes:
-   │  └─ uid: john.doe
-   │  └─ email: john.doe@example.com
-   │  └─ department: Finance
-   │  └─ memberOf: [Finance_Team, Finance_Approvers]
+   Directory entry for john.doe:
+     uid: john.doe
+     mail: john.doe@example.com
+     department: Finance
+     memberOf: Finance_Team, Finance_Approvers
 
-2. AUTHENTICATION (Proving who you are)
-   ├─ John enters password + FIDO2 key
-   ├─ Directory validates credentials
-   ├─ MFA verified ✓
-   └─ Session/Token created
+2. AUTHENTICATION
+   John enters his password and confirms with a FIDO2 key.
+   The directory validates the password; the IdP validates the key.
+   MFA result: satisfied. A short-lived session token is issued.
 
-3. AUTHORIZATION (Deciding what you can do)
-   ├─ John requests: read /data/financials/budget.xlsx
-   ├─ RBAC system checks:
-   │  ├─ User john.doe in group Finance_Team? ✓ Yes
-   │  ├─ Group Finance_Team has role Finance_Analyst? ✓ Yes
-   │  ├─ Role Finance_Analyst has permission read:financial_data? ✓ Yes
-   │  └─ Time-of-day policy: 09-17, business day? ✓ Yes
-   ├─ ABAC conditions:
-   │  ├─ Device compliant/encrypted? ✓ Yes
-   │  ├─ Network from corporate VPN? ✓ Yes
-   │  └─ No anomalous behavior? ✓ Yes
-   └─ DECISION: ALLOW ✓
+3. AUTHORIZATION
+   The RBAC service checks:
+     - john.doe is in Finance_Team: yes
+     - Finance_Team maps to role Finance_Analyst: yes
+     - Finance_Analyst grants read:financial_data: yes
+     - Request falls within the access time window: yes
+   The ABAC layer checks:
+     - Device is compliant and encrypted: yes
+     - Request comes from the corporate VPN: yes
+     - No anomalous behavior detected: yes
+   Decision: ALLOW
 
-4. GOVERNANCE & AUDIT
-   ├─ Log event: john.doe accessed budget.xlsx
-   ├─ Link to quarterly access review
-   ├─ Check SoD: Finance_Analyst can create AND approve? ✓ No conflict
-   └─ Store in audit system (7-year retention)
+4. GOVERNANCE AND AUDIT
+   The access is logged with the user, resource, and time.
+   The access is linked to the quarterly access review.
+   SoD check: Finance_Analyst cannot both create and approve: no conflict.
+   Log is retained for the required period.
 ```
 
-### 1.4 Quick Diagnosis Matrix
+### 1.4 Quick Diagnosis
 
-Use this to identify which layer is the problem:
+| Symptom | Likely layer | Where to look |
+|---------|--------------|---------------|
+| Cannot log in at all | Authentication | Credentials, MFA device, account status |
+| Logged in but cannot see data | Authorization | Group membership, role assignment |
+| LDAP error | Directory | Connection, DN format, TLS |
+| Token rejected | Token | Expiry, signature, audience claim |
+| Access worked yesterday, not today | Policy | Time-based rules, recent SoD changes |
+| Peers have access, you do not | RBAC design | Role assignments, group nesting |
 
-| Symptom | Likely Cause | Solution |
-|---------|-------------|----------|
-| "I can't log in at all" | Authentication Layer | Check credentials, MFA device, account status |
-| "I logged in but don't see my data" | Authorization Layer | Check group memberships, role assignments |
-| "I see an error about LDAP" | Directory Layer | Check LDAP connection, DN format, TLS |
-| "My token was rejected" | Token Layer | Check token expiry, signature, audience claim |
-| "Access was okay yesterday, not today" | Policy Layer | Check time-based policies, SoD rules |
-| "Other people can do this but I can't" | RBAC Design | Check role assignments, group hierarchy |
+### 1.5 Learning Path
 
-### 1.5 Learning Path Recommendations
+**Beginners (0 to 3 months)**
 
-**For Beginners (0-3 months)**:
-1. Understand concepts in 1.1-1.2
-2. Choose ONE technology: LDAP **OR** AD (start with LDAP if Linux-focused, AD if Windows-focused)
-3. Build lab environment with basic users and groups
-4. Practice authentication and basic authorization
-5. Move to Section 5 (RBAC) to understand role concepts
+1. Read Sections 1.1 and 1.2.
+2. Choose one technology: LDAP or AD.
+3. Build a lab with basic users and groups.
+4. Practice authentication and basic authorization.
+5. Read Section 5 for role concepts.
 
-**For Intermediate (3-12 months)**:
-1. Implement hierarchical roles and groups
-2. Add multi-factor authentication
-3. Explore Section 4 (IAM) for SSO integration
-4. Implement governance processes (provisioning, deprovisioning)
-5. Build monitoring and audit logging
+**Intermediate (3 to 12 months)**
 
-**For Advanced (12+ months)**:
-1. Design complex RBAC and SoD models
-2. Implement conditional access and zero trust
-3. Integrate multiple identity providers
-4. Build self-service portals and automation
-5. Achieve SOC 2/ISO 27001 compliance
+1. Implement nested roles and groups.
+2. Add MFA.
+3. Read Section 4 and integrate single sign-on.
+4. Implement joiner, mover, and leaver processes.
+5. Build monitoring and audit logging.
+
+**Advanced (12+ months)**
+
+1. Design complex RBAC and SoD models.
+2. Implement conditional access and zero trust controls.
+3. Integrate multiple identity providers.
+4. Build self-service workflows and automation.
+5. Support your organization through SOC 2 or ISO 27001 audits.
 
 ---
 
-## 2. LDAP Mastery — Zero to Hero
-### Complete Guide to LDAP Directory Services
+## 2. LDAP
 
-### 2.1 Core LDAP Concepts & Architecture
-- LDAP v3 (RFC 4510+): operations bind, search, add, modify, delete, compare.
-- Directory Information Tree (DIT): hierarchical entries under Base DN.
-- DN/RDN: Distinguished Name uniquely identifies an entry; RDN is the leaf.
-- ObjectClass/Schema: Defines allowed attributes (inetOrgPerson, posixAccount, groupOfNames).
-- Filters: Boolean search expressions, e.g., (&(objectClass=inetOrgPerson)(mail=*@example.com)).
+### 2.1 Core Concepts
 
-### 2.2 Directory Information Tree (DIT) Design
+- **LDAP v3** (RFC 4510 and related): operations include bind, search, add, modify, delete, and compare.
+- **Directory Information Tree (DIT):** a hierarchy of entries under a base DN.
+- **DN and RDN:** a Distinguished Name uniquely identifies an entry; the Relative DN is its leaf component.
+- **Object classes and schema:** define allowed attributes, for example `inetOrgPerson`, `posixAccount`, `groupOfNames`.
+- **Filters:** boolean search expressions, for example `(&(objectClass=inetOrgPerson)(mail=*@example.com))`.
+
+### 2.2 DIT Design
+
 - Base DN: `dc=example,dc=com`
-- Organizational Units: `ou=People`, `ou=Groups`, `ou=Services`, `ou=Systems`
-- Users: `inetOrgPerson` (+ `posixAccount` for POSIX login)
+- Organizational units: `ou=People`, `ou=Groups`, `ou=Services`, `ou=Systems`
+- Users: `inetOrgPerson`, with `posixAccount` for Linux login
 - Groups: `groupOfNames` (or `groupOfUniqueNames`)
 
-Example tree
-```
+```text
 dc=example,dc=com
 ├── ou=People
 ├── ou=Groups
@@ -396,9 +398,10 @@ dc=example,dc=com
 └── ou=Systems
 ```
 
-### 2.3 Practical Operations: LDAP Commands & Workflows
+### 2.3 Common Operations
 
-Add a user (LDIF)
+Add a user (LDIF):
+
 ```ldif
 dn: uid=jdoe,ou=People,dc=example,dc=com
 objectClass: inetOrgPerson
@@ -413,7 +416,8 @@ homeDirectory: /home/jdoe
 loginShell: /bin/bash
 ```
 
-Add a group (LDIF)
+Add a group (LDIF):
+
 ```ldif
 dn: cn=developers,ou=Groups,dc=example,dc=com
 objectClass: groupOfNames
@@ -421,41 +425,47 @@ cn: developers
 member: uid=jdoe,ou=People,dc=example,dc=com
 ```
 
-CLI basics
+Command-line basics:
+
 ```bash
-# Search (simple bind)
+# Search with a simple bind
 ldapsearch -x -H ldap://ldap.example.com -b "dc=example,dc=com" "(uid=jdoe)"
 
-# Add/modify/delete
-ldapadd -x -D "cn=admin,dc=example,dc=com" -W -f user.ldif
+# Add, modify, delete (-W prompts for the password)
+ldapadd    -x -D "cn=admin,dc=example,dc=com" -W -f user.ldif
 ldapmodify -x -D "cn=admin,dc=example,dc=com" -W -f modify.ldif
 ldapdelete -x -D "cn=admin,dc=example,dc=com" -W "uid=jdoe,ou=People,dc=example,dc=com"
 
-# Bind test
+# Verify that a user can bind
 ldapwhoami -x -H ldap://ldap.example.com \
   -D "uid=jdoe,ou=People,dc=example,dc=com" -W
 ```
 
-### 2.4 LDAP Security Hardening
-- Use LDAPS (636) or StartTLS; enforce TLS 1.2+; pin CA; disable anonymous binds.
-- Store passwords with strong hashes; prevent broad read of `userPassword` and sensitive attributes via ACLs.
-- Implement rate limits and lockout policies (directory-dependent); audit failures.
+### 2.4 Security Hardening
 
-### 2.5 Performance: Indexing & Query Optimization
+- Use LDAPS (port 636) or StartTLS. Require TLS 1.2 or later and trust only the intended CA.
+- Disable anonymous binds.
+- Store passwords as salted hashes. Use ACLs to prevent broad reads of `userPassword` and other sensitive attributes.
+- Apply lockout and rate limits where the directory supports them, and audit authentication failures.
+
+### 2.5 Indexing and Query Performance
+
 - Index frequently searched attributes: `uid`, `cn`, `mail`, `member`, `memberOf`.
-- Scope searches to the correct base; request only needed attributes.
-- Set time/size limits to avoid unbounded scans.
+- Scope searches to the narrowest base DN that works.
+- Request only the attributes you need.
+- Set size and time limits to prevent unbounded scans.
 
-### 2.6 High Availability & Replication Strategies
-- Provider/consumer or multi-master; design for at least two replicas per site.
-- Monitor replication lag; understand last-writer-wins at attribute level.
+### 2.6 High Availability and Replication
 
-### 2.7 Integration: Linux System Authentication with SSSD
-- NSS/PAM via SSSD resolves users and authenticates against LDAP/LDAPS.
-- Cache credentials, disable enumeration, secure `sssd.conf` (0600 permissions).
+- Use provider and consumer replication, or multi-master where the directory supports it. Plan for at least two replicas per site.
+- Monitor replication lag. Understand conflict resolution. Many directories resolve conflicts per attribute, with the last writer winning.
 
-Minimal sssd.conf example
+### 2.7 Linux Integration with SSSD
+
+SSSD provides NSS and PAM integration with LDAP, including credential caching.
+
 ```ini
+# /etc/sssd/sssd.conf  (must be mode 0600, owned by root)
 [sssd]
 services = nss, pam
 domains = LDAP
@@ -472,136 +482,162 @@ cache_credentials = true
 ```
 
 ### 2.8 Application Integration Pattern
-1) App binds with a read-only service account.
-2) Search for user DN by `uid`/`mail`.
-3) Bind as the user DN with provided password to verify.
-4) Fetch attributes and groups (`memberOf`) to build an auth context.
 
-### 2.9 LDAP Troubleshooting & Diagnostics
+1. The application binds with a read-only service account.
+2. It searches for the user's DN by `uid` or `mail`, using escaped input.
+3. It binds as the user DN with the supplied password to verify it.
+4. It reads attributes and group memberships to build the session's authorization context.
+
+### 2.9 Troubleshooting Commands
+
 ```bash
-# Test LDAPS and certificate chain
+# Inspect the TLS certificate chain
 openssl s_client -connect ldap.example.com:636 -showcerts
 
-# Who am I?
+# Confirm the identity the server sees
 ldapwhoami -x -H ldaps://ldap.example.com -D "cn=admin,dc=example,dc=com" -W
 
-# Groups referencing a member
+# Find groups that reference a user
 ldapsearch -x -b "ou=Groups,dc=example,dc=com" \
   "(member=uid=jdoe,ou=People,dc=example,dc=com)" cn
 ```
 
-### 2.10 Hands-On Exercises: LDAP Zero to Hero
-- Create People/Groups OUs, add two users and a group, enable memberOf overlay, validate membership from the user entry.
-- Enforce StartTLS/LDAPS only; verify with `openssl s_client`.
-- Add indexes for `uid`, `mail`, `member` and measure search latency before/after.
-- Integrate a Linux host with SSSD; log in with an LDAP user; restrict sudo via LDAP.
-- Implement an app login: service bind → search → user bind → group claims.
+### 2.10 Exercises
+
+1. Create People and Groups OUs, add two users and one group, enable the `memberOf` overlay, and confirm that membership appears on the user entry.
+2. Enforce LDAPS or StartTLS only, and verify the certificate with `openssl s_client`.
+3. Add indexes for `uid`, `mail`, and `member`, and measure search latency before and after.
+4. Join a Linux host to LDAP with SSSD, log in as an LDAP user, and restrict sudo through an LDAP group.
+5. Build an application login that performs a service bind, a user search, a user bind, and a group lookup.
 
 ---
 
-## 3. Active Directory (AD) Mastery — Zero to Hero
-### Complete Guide to Enterprise Windows Directory Services
+## 3. Active Directory
 
-### 3.1 AD Architecture & Core Concepts
-- Domain: Security boundary (e.g., corp.example.com). Contains users, groups, computers.
-- Forest: One or more domains with shared schema and global catalog.
-- OU: Delegation and policy scope (GPOs, admin rights) — not for org charts.
-- DC: Domain Controller hosting AD DS, KDC (Kerberos), Global Catalog; multi-master replication.
-- Sites/Subnets: Physical topology for logon/DC selection and replication schedules.
-- DNS: AD-integrated zones; SRV records enable service discovery.
-- GPO: Group Policy Objects; central configuration for users/computers.
-- Auth: Kerberos (preferred), NTLM (legacy; restrict/audit).
+### 3.1 Architecture
 
-### 3.2 AD Design Principles & Best Practices
-- Prefer a single domain per forest; keep structure simple.
-- OU design for delegation and GPO scoping (e.g., Workstations, Servers, Users, Service Accounts).
-- Group strategy: AGDLP — Accounts → Global Groups → Domain Local → Permissions.
-- Tiered admin model: Tier 0 (DCs), Tier 1 (Servers), Tier 2 (Workstations); separate admin identities per tier.
+- **Domain:** a security and policy boundary, for example `corp.example.com`. Holds users, groups, and computers.
+- **Forest:** one or more domains sharing a schema and a global catalog. The forest root is the true security boundary.
+- **Organizational unit (OU):** used for delegation and Group Policy scope. OUs can reflect organization structure, but their main purpose is administration and policy.
+- **Domain controller (DC):** hosts AD DS, the Kerberos KDC, and the global catalog. Replicates with multi-master replication.
+- **Sites and subnets:** map physical topology to logon and DC selection, and to replication schedules.
+- **DNS:** AD-integrated zones. SRV records enable service discovery.
+- **Group Policy Objects (GPOs):** central configuration for users and computers.
+- **Authentication:** Kerberos is preferred. NTLM is legacy; restrict and audit it.
 
-### 3.3 Practical Operations: PowerShell Administration
-Create OUs
+### 3.2 Design Principles
+
+- Keep the forest and domain structure as simple as the business allows. Prefer one domain per forest unless there is a clear reason for more.
+- Design OUs for delegation and GPO scope, for example Workstations, Servers, Users, Groups, Service Accounts.
+- Use AGDLP group nesting: accounts go into global groups, global groups go into domain local groups, and domain local groups hold permissions on resources.
+- Use a tiered administration model:
+  - Tier 0: domain controllers and identity infrastructure
+  - Tier 1: servers
+  - Tier 2: workstations
+  - Separate administrative accounts for each tier.
+
+### 3.3 PowerShell Administration
+
+Create OUs:
+
 ```powershell
 New-ADOrganizationalUnit -Name "Workstations" -Path "DC=corp,DC=example,DC=com"
-New-ADOrganizationalUnit -Name "Servers" -Path "DC=corp,DC=example,DC=com"
-New-ADOrganizationalUnit -Name "Users" -Path "DC=corp,DC=example,DC=com"
-New-ADOrganizationalUnit -Name "Groups" -Path "DC=corp,DC=example,DC=com"
+New-ADOrganizationalUnit -Name "Servers"      -Path "DC=corp,DC=example,DC=com"
+New-ADOrganizationalUnit -Name "Users"        -Path "DC=corp,DC=example,DC=com"
+New-ADOrganizationalUnit -Name "Groups"       -Path "DC=corp,DC=example,DC=com"
 ```
 
-Create user and groups (AGDLP)
+Create a user and apply AGDLP:
+
 ```powershell
-New-ADUser -Name "John Doe" -SamAccountName jdoe \
-  -UserPrincipalName jdoe@corp.example.com \
-  -AccountPassword (Read-Host -AsSecureString "Password") -Enabled $true \
+New-ADUser -Name "John Doe" -SamAccountName jdoe `
+  -UserPrincipalName jdoe@corp.example.com `
+  -AccountPassword (Read-Host -AsSecureString "Initial password") `
+  -Enabled $true `
   -Path "OU=Users,DC=corp,DC=example,DC=com"
 
-New-ADGroup -Name "GG_Dev" -GroupScope Global -Path "OU=Groups,DC=corp,DC=example,DC=com"
+New-ADGroup -Name "GG_Dev"    -GroupScope Global      -Path "OU=Groups,DC=corp,DC=example,DC=com"
 New-ADGroup -Name "DL_AppX_RW" -GroupScope DomainLocal -Path "OU=Groups,DC=corp,DC=example,DC=com"
-Add-ADGroupMember -Identity "GG_Dev" -Members jdoe
+
+Add-ADGroupMember -Identity "GG_Dev"     -Members jdoe
 Add-ADGroupMember -Identity "DL_AppX_RW" -Members "GG_Dev"
 ```
 
-Kerberos SPN and constrained delegation
+Service principal names and constrained delegation:
+
 ```powershell
-# Register SPN for a service account
+# Register an SPN for a service account (setspn takes the DOMAIN\account form)
 setspn -S HTTP/app.corp.example.com CORP\svcApp
 
-# Enable constrained delegation to specific SPNs
-Set-ADAccountControl -Identity CORP\svcApp -TrustedToAuthForDelegation $true
-Set-ADObject -Identity (Get-ADUser svcApp).DistinguishedName \
-  -Add @{"msDS-AllowedToDelegateTo"="HTTP/api.corp.example.com"}
+# Allow the service account to delegate to one specific SPN.
+# Set-ADAccountControl and Set-ADObject take the sAMAccountName or DN, not DOMAIN\name.
+Set-ADAccountControl -Identity svcApp -TrustedToAuthForDelegation $true
+Set-ADObject -Identity (Get-ADUser svcApp).DistinguishedName `
+  -Add @{ "msDS-AllowedToDelegateTo" = "HTTP/api.corp.example.com" }
 ```
 
-GPO essentials
-- Test OU, link GPOs, avoid blocking inheritance unless necessary.
-- Use security baselines; drive mappings; printers; Windows Update; scripts.
+GPO practice:
 
-### 3.4 AD Security Hardening & Privileged Access
-- LAPS/Windows LAPS for local admin password rotation.
-- gMSA for services; avoid static passwords and interactive logon.
-- Restrict Domain Admins; use Just-In-Time elevation (PIM/PAM) and privileged access workstations.
-- Advanced Audit Policy; forward Windows Event Logs to SIEM; monitor DC health.
+- Test in a pilot OU before linking widely.
+- Avoid blocking inheritance unless there is a specific reason.
+- Use security baselines for hardening settings. Use GPOs for drive mappings, printers, Windows Update settings, and logon scripts.
 
-### 3.5 AD Operations: Health Monitoring & Replication
+### 3.4 Security Hardening and Privileged Access
+
+- Deploy Windows LAPS to rotate local administrator passwords automatically.
+- Use group managed service accounts (gMSA) for services. Avoid static service passwords and interactive logon for service accounts.
+- Restrict Domain Admins. Use just-in-time elevation (PIM or PAM) and privileged access workstations.
+- Enable Advanced Audit Policy. Forward Windows event logs to a SIEM. Monitor domain controller health.
+
+### 3.5 Health and Replication
+
 ```powershell
-# DC and replication health
-dcdiag /v
-repadmin /replsummary
-repadmin /showrepl
-
-# SYSVOL replication (DFSR vs FRS)
-dfsrmig /getglobalstate
+dcdiag /v                  # domain controller health
+repadmin /replsummary      # replication summary across DCs
+repadmin /showrepl         # replication detail per partner
+dfsrmig /getglobalstate    # SYSVOL replication migration state
 ```
 
-### 3.6 Hybrid Identity: On-Premises AD + Cloud
-- Sync identities with a cloud IdP; filter by OU; handle UPN suffixes.
-- Conditional access (MFA, device compliance) for cloud apps; use group-based assignments.
-- Understand differences: AD roles (on-prem), cloud directory roles, and resource IAM (e.g., cloud provider RBAC).
+### 3.6 Hybrid Identity
 
-### 3.7 Hands-On Exercises: AD Zero to Hero
-- Create OU structure and group model (AGDLP); apply NTFS ACLs via Domain Local groups.
-- Implement LAPS; verify randomized local admin passwords accessible to the right admins only.
-- Configure gMSA for an app service; register SPN; test Kerberos constrained delegation.
-- Build a test GPO for security baseline; pilot in a staging OU; measure impact.
+- Synchronize on-premises identities to a cloud identity provider. Filter by OU to limit what syncs.
+- Plan UPN suffixes so that sign-in names match the cloud tenant.
+- Enforce conditional access (MFA, device compliance) for cloud applications. Assign access through groups.
+- Keep three things separate: on-premises AD roles, cloud directory roles, and cloud resource IAM (for example, the cloud provider's RBAC).
+
+### 3.7 Exercises
+
+1. Build the OU structure and an AGDLP group model. Apply NTFS permissions through domain local groups.
+2. Deploy Windows LAPS. Confirm that only the right administrators can read the rotated passwords.
+3. Configure a gMSA for an application service. Register an SPN and test Kerberos constrained delegation.
+4. Build a security baseline GPO, pilot it in a staging OU, and measure its effect before wider rollout.
 
 ---
 
-## 4. Modern IAM — Zero to Hero
-### Building Identity & Access Management Systems with OAuth2, OIDC, and SAML
+## 4. Modern IAM
 
-### 4.1 IAM Scope & Building Blocks
-- Subjects: users, service principals, workloads.
-- Credentials: passwords, keys, certificates, tokens.
-- Tokens: SAML Assertions, OIDC ID Tokens, OAuth2 Access Tokens (often JWTs).
-- Policies: Allow/Deny on actions and resources with conditions.
-- Governance: JML lifecycle, approvals, reviews, SoD, and audit trails.
+### 4.1 Scope and Building Blocks
 
-### 4.2 Modern Protocols: OAuth2, OIDC, SAML
-- SAML 2.0: Browser SSO, XML assertions; common for enterprise SaaS.
-- OIDC: Identity layer on OAuth2; provides ID Token; modern web/mobile.
-- OAuth2: Delegated authorization. Flows: Authorization Code (PKCE), Client Credentials, Device Code.
-- SCIM: Provisioning standard to create/update/deprovision users and groups in apps.
+- **Subjects:** users, service principals, workloads.
+- **Credentials:** passwords, keys, certificates, tokens.
+- **Tokens:** SAML assertions, OIDC ID tokens, OAuth 2.0 access tokens (often JWTs).
+- **Policies:** allow or deny actions on resources, with conditions.
+- **Governance:** joiner, mover, and leaver processes, approvals, reviews, SoD, audit trails.
 
-### 4.3 Token Anatomy: Understanding JWTs
+### 4.2 Protocols
+
+- **SAML 2.0:** browser-based single sign-on with XML assertions. Common in enterprise SaaS.
+- **OIDC:** an identity layer on top of OAuth 2.0. Issues an ID token that states who the user is. Used by modern web and mobile applications.
+- **OAuth 2.0:** delegated authorization. Common flows:
+  - Authorization code with PKCE (users, web and mobile)
+  - Client credentials (services)
+  - Device code (input-constrained devices)
+- **SCIM:** a standard for creating, updating, and deprovisioning users and groups in applications.
+
+### 4.3 Token Structure
+
+The example below shows an access token payload. Claim names vary by identity provider.
+
 ```json
 {
   "iss": "https://idp.example.com",
@@ -609,43 +645,62 @@ dfsrmig /getglobalstate
   "aud": "api://backend",
   "exp": 1735689600,
   "iat": 1735686000,
-  "nonce": "random",
   "amr": ["mfa"],
   "groups": ["dev", "finance"],
   "scp": ["read:orders", "write:orders"]
 }
 ```
 
-### 4.4 IAM Architecture Patterns
-- Central IdP (Identity Provider) issues tokens; apps verify tokens and enforce authorization locally or via a gateway.
-- Federation with enterprise directories (AD/LDAP) for passwordless SSO to apps.
-- Gateway/API layer enforces OAuth scopes/claims centrally; services trust gateway.
+Notes:
 
-### 4.5 Building OIDC-Protected Applications
-1) Register an app in the IdP with redirect URIs and PKCE enabled.
-2) Client starts Authorization Code + PKCE flow.
-3) IdP authenticates user (MFA) and returns code to redirect URI.
-4) Client exchanges code + verifier at token endpoint; receives ID/Access/Refresh tokens.
-5) Client calls API with Bearer access_token; API validates signature, audience, expiry, and claims.
+- `nonce` belongs in the ID token, to bind it to an authentication request. It does not belong in an access token.
+- Access tokens are for APIs. ID tokens are for the client application. Do not send an ID token to an API as an access token.
+- Validate `iss`, `aud`, `exp`, the signature, and the expected algorithm on every token you accept.
 
-Authorize URL example
+### 4.4 Architecture Patterns
+
+- A central identity provider (IdP) issues tokens. Applications and APIs verify the tokens and enforce authorization locally, or through a gateway.
+- Federate enterprise directories (AD or LDAP) to the IdP so users sign in once.
+- An API gateway can enforce OAuth scopes and claims centrally, so backend services trust the gateway.
+
+### 4.5 Building an OIDC-Protected Application
+
+1. Register the application with the IdP. Set exact redirect URIs and enable PKCE.
+2. The client starts the authorization code flow with PKCE, including `state` and `nonce`.
+3. The IdP authenticates the user, enforcing MFA where policy requires it, and returns a code to the redirect URI.
+4. The client exchanges the code and the PKCE verifier at the token endpoint and receives an ID token, an access token, and optionally a refresh token.
+5. The client validates the ID token. The client calls the API with the access token as a bearer credential. The API validates the signature, audience, expiry, and required claims or scopes.
+
+Authorization request example:
+
 ```text
-GET /authorize?response_type=code&client_id=CLIENT&redirect_uri=URL&scope=openid%20profile%20email&code_challenge=...&code_challenge_method=S256&state=...
+GET /authorize?response_type=code
+  &client_id=CLIENT_ID
+  &redirect_uri=https%3A%2F%2Fapp.example.com%2Fcallback
+  &scope=openid%20profile%20email
+  &state=RANDOM_STATE
+  &nonce=RANDOM_NONCE
+  &code_challenge=CHALLENGE
+  &code_challenge_method=S256
 ```
 
-### 4.6 User Provisioning with SCIM
-- IdP pushes user objects and group memberships to SaaS via SCIM.
-- Map attributes and groups to application roles; deprovision on termination.
+### 4.6 Provisioning with SCIM
 
-### 4.7 Authorization Policy Models
-- RBAC: Roles grant permissions; simple audits; stable environments.
-- ABAC: Attributes (user, resource, context) gate access; dynamic and fine-grained.
-- ReBAC: Relationship graphs define who can access what (common in collaboration apps).
-- Hybrid: RBAC baseline + ABAC conditions + emergency access.
+- The IdP pushes user objects and group memberships to SaaS applications through SCIM.
+- Map attributes and groups to application roles.
+- Deprovision accounts when the user leaves or the group membership ends. Measure the time it takes.
 
-### 4.8 Cloud Platform IAM Examples
+### 4.7 Authorization Models
 
-AWS IAM policy (API allow)
+- **RBAC:** roles grant permissions. Simple to audit. Works well in stable environments.
+- **ABAC:** attributes of the user, resource, and context gate access. Flexible and fine-grained, but harder to reason about.
+- **ReBAC:** relationship graphs define access. Common in collaboration tools.
+- **Hybrid:** an RBAC baseline, ABAC conditions for sensitive cases, and a controlled emergency access path.
+
+### 4.8 Cloud Examples
+
+AWS API Gateway invocation policy (grants invoke rights on specific routes):
+
 ```json
 {
   "Version": "2012-10-17",
@@ -653,99 +708,117 @@ AWS IAM policy (API allow)
     {
       "Sid": "AllowReadOrders",
       "Effect": "Allow",
-      "Action": ["orders:Get*", "orders:List*"],
-      "Resource": "arn:aws:execute-api:region:acct:api-id/*"
+      "Action": "execute-api:Invoke",
+      "Resource": "arn:aws:execute-api:us-east-1:123456789012:abc123/prod/GET/orders/*"
     }
   ]
 }
 ```
 
-Kubernetes RBAC (namespace role)
+Replace the region, account ID, API ID, and stage with your own values.
+
+Kubernetes namespace RBAC:
+
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: app
-  name: read-orders
+  name: read-pods
 rules:
 - apiGroups: [""]
   resources: ["pods"]
   verbs: ["get", "list", "watch"]
 ---
-kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
 metadata:
-  name: read-orders-binding
+  name: read-pods-binding
   namespace: app
 subjects:
 - kind: Group
   name: dev
+  apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
-  name: read-orders
+  name: read-pods
   apiGroup: rbac.authorization.k8s.io
 ```
 
-### 4.9 Authentication Hardening & MFA
-- MFA by default; prefer phishing-resistant methods (FIDO2/WebAuthn).
-- Conditional Access: device posture, network, geo, risk signals; continuous access evaluation.
-- Secrets: no hardcoded secrets; rotate keys; use KMS/HSM; minimize token lifetimes.
+The `dev` group name must match the group claim your cluster receives from the identity provider.
 
-### 4.10 IAM Governance & Lifecycle Management
-- Joiner/Mover/Leaver automation; role-based entitlements; exception workflow with approvals.
-- Access reviews and recertification; SoD checks and detective controls.
-- Logs and analytics: centralized audit and anomaly detection.
+### 4.9 Authentication Hardening
 
-### 4.11 Hands-On Exercises: IAM Zero to Hero
-- Register an OIDC app with Authorization Code + PKCE; obtain tokens; introspect ID token.
-- Protect an API with JWT validation; enforce scope and group claims.
-- Build SCIM mappings to provision users to a SaaS app and test deprovisioning.
-- Add conditional access requiring MFA and compliant device for an admin app.
+- Require MFA by default. Use phishing-resistant methods (FIDO2 and WebAuthn) for administrators.
+- Use conditional access based on device posture, network, location, and risk signals. Evaluate access continuously, not only at sign-in.
+- Do not hardcode secrets. Rotate keys. Store them in a KMS or HSM. Keep token lifetimes short.
+
+### 4.10 Governance and Lifecycle
+
+- Automate joiner, mover, and leaver processes. Base entitlements on roles.
+- Route exceptions through approval workflows with expiry.
+- Run access reviews and recertification campaigns. Detect and remediate SoD conflicts.
+- Centralize audit logs and detect anomalies.
+
+### 4.11 Exercises
+
+1. Register an OIDC application using authorization code with PKCE. Obtain tokens, and validate the ID token.
+2. Protect an API with JWT validation. Enforce a required scope and a group claim.
+3. Build SCIM mappings that provision users to a test SaaS application, then test deprovisioning.
+4. Add conditional access that requires MFA and a compliant device for an administrative application.
 
 ---
 
-## 5. RBAC Engineering — Zero to Hero
-### Designing & Implementing Role-Based Access Control
+## 5. RBAC Engineering
 
-### 5.1 RBAC Concepts & Models
-- Subject → Role → Permission → Resource.
-- NIST RBAC: Core (users, roles, permissions, sessions), Hierarchical (role inheritance), Constrained (SoD and cardinality).
-- Administrative RBAC (ARBAC): Who can create/assign roles and manage entitlements.
+### 5.1 Concepts and Models
 
-### 5.2 Role Engineering Process & Methodology
-1) Inventory resources and permissions (systems, APIs, data).
-2) Discover access patterns (log mining, interviews, role mining tools).
-3) Define role taxonomy:
-   - Business roles (Sales Rep, Support Agent)
-   - IT roles (DBA, SysAdmin)
-   - Application roles (Jira Admin, Warehouse Reader)
-   - Platform roles (K8s Namespace Admin)
-4) Map roles → entitlements; enforce least privilege.
-5) SoD constraints (e.g., Requester vs Approver cannot be the same person).
-6) Governance: role owners, approval flows, review cadence, change management.
+- Subject to role to permission to resource.
+- NIST RBAC has three levels:
+  - Core: users, roles, permissions, sessions.
+  - Hierarchical: role inheritance.
+  - Constrained: separation of duties and cardinality limits.
+- Administrative RBAC (ARBAC): defines who may create, assign, and change roles.
 
-### 5.3 RBAC Implementation Patterns
-- Directory-centric (AD/LDAP): Users → Global Groups (roles) → Domain Local Groups (permissions) → ACLs.
-- App-native RBAC: Map IdP groups/claims to app roles; manage in app config.
-- Cloud RBAC: Bind IdP groups to cloud roles; use infra-as-code (Terraform) for repeatability.
-- Policy as code: Represent roles and grants in Git; CI validates SoD and drift.
+### 5.2 Role Engineering Process
 
-AGDLP example
+1. Inventory resources and the permissions they expose: systems, APIs, data.
+2. Discover actual access patterns through log analysis and interviews. Role mining tools can help.
+3. Define the role taxonomy:
+   - Business roles (sales representative, support agent)
+   - IT roles (database administrator, system administrator)
+   - Application roles (Jira administrator, warehouse reader)
+   - Platform roles (Kubernetes namespace administrator)
+4. Map roles to entitlements. Apply least privilege.
+5. Define SoD constraints. For example, a requester cannot approve their own request.
+6. Assign owners to each role. Set approval flows, review cadence, and change management.
+
+### 5.3 Implementation Patterns
+
+- **Directory-centric (AD or LDAP):** users are members of global groups that act as roles. Those groups are nested into domain local groups that hold permissions on resources and ACLs (AGDLP).
+- **Application-native RBAC:** map IdP groups or claims to application roles. Manage the mapping in application configuration.
+- **Cloud RBAC:** bind IdP groups to cloud roles. Manage with infrastructure as code for repeatability.
+- **Policy as code:** store roles and grants in version control. Run CI checks for SoD violations and drift.
+
+AGDLP chain:
+
+```text
+Users -> GG_Role_Dev -> DL_AppX_RW -> NTFS or ACL on the resource
 ```
-Users -> GG_Role_Dev -> DL_AppX_RW -> NTFS/ACL on resource
-```
 
-SQL RBAC example (SQL Server)
+SQL Server example (maps a Windows group to a database role):
+
 ```sql
 CREATE ROLE reporting_reader;
 GRANT SELECT ON SCHEMA::reporting TO reporting_reader;
--- Map directory group to DB role via login/user
+
 CREATE LOGIN [CORP\GG_Reporting] FROM WINDOWS;
-CREATE USER [CORP\GG_Reporting] FOR LOGIN [CORP\GG_Reporting];
+CREATE USER  [CORP\GG_Reporting] FOR LOGIN [CORP\GG_Reporting];
 EXEC sp_addrolemember 'reporting_reader', 'CORP\GG_Reporting';
 ```
 
-Kubernetes namespace RBAC
+Kubernetes namespace maintainer role:
+
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -755,220 +828,265 @@ metadata:
 rules:
 - apiGroups: ["apps"]
   resources: ["deployments"]
-  verbs: ["get","list","watch","create","update","patch","delete"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 ---
-kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
 metadata:
-  namespace: team-a
   name: bind-maintainer
+  namespace: team-a
 subjects:
 - kind: Group
   name: GG_TeamA_Maintainer
+  apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
   name: maintainer
   apiGroup: rbac.authorization.k8s.io
 ```
 
-### 5.4 Separation of Duties & Risk Controls
-- Static SoD: Prevent conflicting assignments concurrently.
-- Dynamic SoD: Allow roles but restrict usage in the same session or require dual control.
-- Emergency access (break-glass) with time-bound elevation and detailed auditing.
+### 5.4 SoD and Risk Controls
 
-### 5.5 RBAC Operations & Maintenance
-- Avoid role explosion: prefer composable roles and attributes for edge cases.
-- Quarterly access reviews; remove stale memberships; automate recertification.
-- Test authorization paths; unit-test permissions and policy evaluation.
+- **Static SoD:** prevent conflicting role assignments at the time of grant.
+- **Dynamic SoD:** allow both roles but prevent their use together in one workflow or session. Require a second approver for high-impact actions.
+- **Break-glass access:** provide time-bound elevation with strong authentication, alerting, and detailed audit records.
 
-### 5.6 Hands-On Exercises: RBAC Zero to Hero
-- Define a role hierarchy for an e-commerce app (viewer → editor → admin) and implement in app and IdP.
-- Implement SoD between Payment Creator and Payment Approver; enforce via policy and review.
-- Migrate direct user permissions to group-based roles; validate using access logs.
+### 5.5 Operations
 
----
+- Avoid role explosion. Prefer composable roles, and use attributes for edge cases.
+- Run access reviews quarterly. Remove stale memberships. Automate recertification where possible.
+- Write tests for permission logic. Test authorization paths, including denial paths.
 
-## 6. Integration Patterns: Mapping AD, LDAP, IAM, and RBAC
-### How Identity Systems Work Together
+### 5.6 Exercises
 
-- Identity
-  - LDAP/AD: entries (user, group, computer) with DN and attributes
-  - IAM: user, service principal, workload identity
-  - RBAC: subject (user/group/service)
-
-- Group/Role
-  - LDAP/AD: security groups; dynamic groups possible; AGDLP nesting
-  - IAM: roles/policies/entitlements; groups map to app roles or claims
-  - RBAC: roles bind to permissions; inheritance possible
-
-- Policy/Permission
-  - LDAP/AD: ACLs on directory entries, NTFS/share ACLs, GPO rights
-  - IAM: JSON/YAML policies (allow/deny, actions, resources, conditions)
-  - RBAC: permission sets per resource type
-
-- AuthN/AuthZ
-  - LDAP/AD: Bind, Kerberos/NTLM; LDAPS for apps
-  - IAM: Tokens (SAML/OIDC/OAuth2), Conditional Access, MFA
-  - RBAC: Authorization evaluates role/attribute memberships
-
-- Provisioning
-  - LDAP/AD: ldapadd/modify; AD cmdlets; sync connectors
-  - IAM: SCIM, APIs, workflows
-  - RBAC: Assign roles by groups or attributes; track approvals
+1. Define a role hierarchy for an e-commerce application (viewer, editor, administrator). Implement it in the application and in the IdP.
+2. Enforce SoD between payment creator and payment approver, first through policy, then through a review process.
+3. Move direct user permissions to group-based roles. Verify the change with access logs.
 
 ---
 
-## 7. Reference Architectures: Production-Ready Blueprints
-### Complete End-to-End Identity System Designs
+## 6. Integration Patterns
 
-### 7.1 Windows-Centric Enterprise Architecture (On-Premises + Cloud)
-- AD forest (single domain), Sites/Subnets; OU design for Workstations/Servers/Users/Service Accounts.
-- AGDLP for permissions; GPO baselines; LAPS; gMSA; Kerberos constrained delegation.
-- Cloud IdP federation; Conditional Access; MFA; group-based app assignments; SCIM to SaaS.
+How identity systems map to one another:
 
-### 7.2 Linux-First Architecture with OpenLDAP
-- DIT: People/Groups/Systems/Services; LDAPS; indexes; memberOf overlay.
-- SSSD for NSS/PAM; sudo via LDAP; SSH keys managed in directory (restricted read).
-- Replication and monitoring; logs to SIEM.
+**Identity**
 
-### 7.3 Kubernetes Platform with Centralized Identity
-- OIDC between cluster API server and IdP; groups as claims.
-- Namespaces per team; K8s RBAC; admission policies; Secret management via KMS.
-- CI/CD integrates with IdP (workload identity) for short-lived credentials.
+- LDAP and AD: entries (user, group, computer) with DNs and attributes.
+- IAM: users, service principals, workload identities.
+- RBAC: subjects are users, groups, or services.
 
-### 7.4 Data Warehouse & Analytics Identity Architecture
-- Directory groups bound to DB roles; row-level security with attributes.
-- SoD between ETL writers and Finance approvers; periodic reviews.
-- Centralized query auditing and lineage tracking.
+**Groups and roles**
+
+- LDAP and AD: security groups, dynamic groups where supported, AGDLP nesting.
+- IAM: roles, policies, and entitlements. Groups map to application roles or token claims.
+- RBAC: roles bind to permissions, with optional inheritance.
+
+**Policy and permission**
+
+- LDAP and AD: ACLs on directory entries, NTFS and share permissions, GPO user rights.
+- IAM: policy documents (allow or deny, actions, resources, conditions).
+- RBAC: permission sets per resource type.
+
+**Authentication and authorization**
+
+- LDAP and AD: LDAP bind, Kerberos, NTLM. Use LDAPS for application binds.
+- IAM: SAML, OIDC, and OAuth 2.0 tokens; conditional access; MFA.
+- RBAC: decisions based on role and attribute membership.
+
+**Provisioning**
+
+- LDAP and AD: `ldapadd` and `ldapmodify`, AD PowerShell cmdlets, synchronization connectors.
+- IAM: SCIM, APIs, workflows.
+- RBAC: role assignment through groups or attributes, with approval records.
+
+---
+
+## 7. Reference Architectures
+
+### 7.1 Windows-Centric Enterprise
+
+- Single AD forest and domain. Sites and subnets match physical topology.
+- OU design for workstations, servers, users, and service accounts.
+- AGDLP for permissions. GPO baselines. Windows LAPS. gMSA for services. Kerberos constrained delegation where required.
+- Cloud identity provider federated to AD. Conditional access and MFA. Group-based application assignment. SCIM to SaaS applications.
+
+### 7.2 Linux-First with OpenLDAP
+
+- DIT with People, Groups, Systems, and Services. LDAPS. Indexes. `memberOf` overlay.
+- SSSD for NSS and PAM. Sudo rules delivered through LDAP. SSH public keys managed in the directory with restricted read access.
+- Replication with monitoring. Logs forwarded to a SIEM.
+
+### 7.3 Kubernetes Platform
+
+- OIDC between the cluster API server and the identity provider. Groups delivered as token claims.
+- A namespace per team. Kubernetes RBAC. Admission policies. Secrets managed through a KMS.
+- CI/CD authenticates to the IdP with workload identity, using short-lived credentials.
+
+### 7.4 Data Warehouse and Analytics
+
+- Directory groups mapped to database roles. Row-level security driven by attributes.
+- SoD between ETL writers and finance approvers. Periodic access reviews.
+- Centralized query auditing and data lineage tracking.
 
 ---
 
 ## 8. Security, Compliance, and Governance
-### Hardening Identity Infrastructure for Enterprise
 
 ### 8.1 Security Controls
-- MFA everywhere; phishing-resistant factors for admins.
-- TLS/LDAPS; cert lifecycle management; pin trusted CAs.
-- PAM/PIM for privileged access; just-in-time elevation; PAWs for admins.
-- Rotate secrets and keys; hardware-backed storage where possible.
 
-### 8.2 Compliance & Governance Anchors
-- Policy-as-code for IAM; change reviews; traceability to tickets.
-- Access recertification; SoD attestation; strong deprovisioning SLAs.
-- Data protection: PII minimization in directories; encrypt at rest and in transit.
+- MFA for all users. Phishing-resistant factors for administrators.
+- TLS everywhere, including LDAPS. Certificate lifecycle management. Pin trusted CAs where the risk justifies it.
+- Privileged access management with just-in-time elevation. Privileged access workstations for administrators.
+- Rotate secrets and keys. Use hardware-backed storage where available.
 
-### 8.3 Monitoring, Detection & Alerting
-- Centralized logs (binds, token issuances, auth failures, policy denials).
-- Alert on risky sign-ins, impossible travel, unusual consent, token replay.
+### 8.2 Compliance and Governance
+
+- Policy as code. Change reviews. Traceability from each change to a ticket.
+- Access recertification. SoD attestation. Deprovisioning service levels.
+- Data protection: minimize personal data in directories. Encrypt data at rest and in transit.
+
+### 8.3 Monitoring and Detection
+
+- Centralize logs for binds, token issuance, authentication failures, and policy denials.
+- Alert on risky sign-ins, impossible travel, unusual consent grants, and possible token replay.
 
 ---
 
 ## 9. Troubleshooting Playbooks
-### Common Issues & Solutions Across All IAM Systems
 
-### 9.1 LDAP Troubleshooting
-- Empty search results: check Base DN, filter, and indexes; verify ACLs.
-- TLS errors: CA trust, hostname mismatch, protocol/cipher suites.
-- Bind failures: DN resolution, account lockout, password policy.
+### 9.1 LDAP
 
-### 9.2 Active Directory Troubleshooting
-- Logon issues: time sync (NTP), DNS SRV records, site placement.
-- Kerberos failures: SPN duplication, clock skew, constrained delegation scope.
-- GPO problems: link order, WMI filter scope, security filtering, RSOP.
+- **Empty search results:** check the base DN, the filter, indexes, and ACLs.
+- **TLS errors:** check CA trust, hostname mismatch, and protocol or cipher configuration.
+- **Bind failures:** check DN resolution, account lockout, and password policy.
 
-### 9.3 IAM Troubleshooting
-- Token validation errors: clock skew, audience/issuer mismatch, key rotation.
-- SAML/OIDC misconfig: redirect URIs, NameID/subject mapping, group claim mapping.
-- SCIM issues: attribute mappings, pagination, conflict resolution.
+### 9.2 Active Directory
 
-### 9.4 RBAC Troubleshooting
-- Over/under-permissioned roles: analyze logs, tighten permissions, add ABAC guards.
-- SoD conflicts: enforce at request time, monitor drift, and remediate.
+- **Logon problems:** check time synchronization (NTP), DNS SRV records, and site placement.
+- **Kerberos failures:** check for duplicate SPNs, clock skew, and the scope of constrained delegation.
+- **GPO problems:** check link order, WMI filter scope, security filtering, and Resultant Set of Policy (RSOP).
+
+### 9.3 IAM
+
+- **Token validation errors:** check clock skew, audience and issuer mismatch, and signing key rotation.
+- **SAML and OIDC misconfiguration:** check redirect URIs, NameID or subject mapping, and group claim mapping.
+- **SCIM issues:** check attribute mappings, pagination, and conflict resolution.
+
+### 9.4 RBAC
+
+- **Over-permissioned or under-permissioned roles:** analyze access logs, tighten permissions, add ABAC guards where needed.
+- **SoD conflicts:** enforce at request time, monitor for drift, remediate promptly.
 
 ---
 
 ## 10. Operations: Checklists and Runbooks
-### Deployment, Hardening, and Operational Procedures
 
 ### 10.1 LDAP Hardening Checklist
-- [ ] LDAPS/StartTLS enforced; no anonymous bind
-- [ ] Indexes for uid, mail, cn, member, memberOf
-- [ ] ACLs restrict sensitive attributes; logs shipped centrally
-- [ ] Replication with monitoring; regular backups and tested restores
+
+- [ ] LDAPS or StartTLS enforced; anonymous bind disabled
+- [ ] Indexes on `uid`, `mail`, `cn`, `member`, `memberOf`
+- [ ] ACLs restrict sensitive attributes; logs shipped to a central system
+- [ ] Replication monitored; backups taken and restores tested
 
 ### 10.2 Active Directory Hardening Checklist
-- [ ] Tiered admin model; separate admin accounts; PAWs
-- [ ] LAPS/Windows LAPS deployed; gMSA for services
-- [ ] Kerberos constrained delegation only; SPNs unique
+
+- [ ] Tiered administration; separate administrative accounts; privileged access workstations
+- [ ] Windows LAPS deployed; gMSA used for services
+- [ ] Constrained delegation only where required; SPNs unique
 - [ ] GPO baselines; Advanced Audit Policy; SIEM integration
 
-### 10.3 IAM Deployment & Hardening Checklist
-- [ ] MFA and Conditional Access; phishing-resistant for admins
-- [ ] Short-lived tokens; key rotation; secrets in KMS/HSM
-- [ ] SCIM provisioning; JML automation; deprovision SLAs
-- [ ] Access reviews; SoD checks; policy-as-code
+### 10.3 IAM Deployment Checklist
+
+- [ ] MFA and conditional access; phishing-resistant methods for administrators
+- [ ] Short-lived tokens; signing key rotation; secrets in a KMS or HSM
+- [ ] SCIM provisioning; joiner, mover, and leaver automation; deprovisioning service levels
+- [ ] Access reviews; SoD checks; policy as code
 
 ### 10.4 RBAC Implementation Checklist
+
 - [ ] Role taxonomy documented; owners assigned
 - [ ] SoD constraints defined and enforced
-- [ ] Infra-as-code for roles and grants; CI validation
+- [ ] Roles and grants managed as infrastructure code; CI validation in place
 - [ ] Quarterly recertification; drift detection
 
 ### 10.5 Critical Runbooks
-- Compromised account: disable, revoke sessions, reset creds, rotate secrets, review logs, re-enable post-review.
-- Token signing key rotation: publish new JWKS, support dual keys, cutover, revoke old, verify clients.
-- Directory restore: determine authoritative vs non-authoritative; follow tested procedures; validate replication.
+
+**Compromised account**
+
+1. Disable the account.
+2. Revoke sessions and tokens.
+3. Reset credentials.
+4. Rotate any secrets the account could read.
+5. Review logs for the period of compromise.
+6. Re-enable only after review and sign-off.
+
+**Token signing key rotation**
+
+1. Publish the new key in the JWKS endpoint alongside the old key.
+2. Switch signing to the new key.
+3. Verify that relying parties accept tokens signed with the new key.
+4. Retire the old key after the longest token lifetime has passed.
+
+**Directory restore**
+
+1. Determine whether the restore is authoritative or non-authoritative.
+2. Follow the tested restore procedure.
+3. Validate replication and application authentication after the restore.
 
 ---
 
 ## 11. Glossary
-### Key Terminology & Abbreviations
 
-- ABAC: Attribute-Based Access Control
-- ACL: Access Control List
-- AD DS: Active Directory Domain Services
-- AGDLP: Accounts→Global→Domain Local→Permissions group nesting model
-- ARBAC: Administrative RBAC
-- DN/RDN: Distinguished/Relative Distinguished Name
-- DIT: Directory Information Tree
-- gMSA: Group Managed Service Account
-- GPO: Group Policy Object
-- IdP: Identity Provider
-- JML: Joiners/Movers/Leavers
-- JWT: JSON Web Token
-- KDC: Key Distribution Center (Kerberos)
-- LAPS/Windows LAPS: Local Administrator Password Solution
-- LDAPS: LDAP over TLS
-- OIDC: OpenID Connect
-- PAM/PIM: Privileged Access/Identity Management
-- PKCE: Proof Key for Code Exchange
-- RBAC: Role-Based Access Control
-- ReBAC: Relationship-Based Access Control
-- SCIM: System for Cross-domain Identity Management
-- SPN: Service Principal Name
-- UPN: User Principal Name
+- **ABAC:** Attribute-Based Access Control
+- **ACL:** Access Control List
+- **AD DS:** Active Directory Domain Services
+- **AGDLP:** Accounts, Global groups, Domain Local groups, Permissions (group nesting model)
+- **ARBAC:** Administrative RBAC
+- **DIT:** Directory Information Tree
+- **DN, RDN:** Distinguished Name, Relative Distinguished Name
+- **gMSA:** Group Managed Service Account
+- **GPO:** Group Policy Object
+- **IdP:** Identity Provider
+- **JML:** Joiner, Mover, Leaver
+- **JWT:** JSON Web Token
+- **KDC:** Key Distribution Center (Kerberos)
+- **LAPS:** Local Administrator Password Solution
+- **LDAPS:** LDAP over TLS
+- **NTLM:** NT LAN Manager (legacy Windows authentication)
+- **OIDC:** OpenID Connect
+- **PAM, PIM:** Privileged Access Management, Privileged Identity Management
+- **PKCE:** Proof Key for Code Exchange
+- **RBAC:** Role-Based Access Control
+- **ReBAC:** Relationship-Based Access Control
+- **SCIM:** System for Cross-domain Identity Management
+- **SPN:** Service Principal Name
+- **UPN:** User Principal Name
 
 ---
 
-## 12. Further Reading & Resources
-### Standards, Guides, and Advanced Topics
+## 12. Further Reading
 
-Standards and specs
-- LDAP: RFC 4510–4519
+**Standards and specifications**
+
+- LDAP: RFC 4510 to RFC 4519
 - Kerberos: RFC 4120
-- SAML 2.0 Core
-- OAuth 2.0 (RFC 6749) and OIDC Core
-- SCIM 2.0 (RFC 7643, RFC 7644)
+- SAML 2.0 Core (OASIS)
+- OAuth 2.0: RFC 6749. PKCE: RFC 7636
+- OpenID Connect Core 1.0
+- SCIM 2.0: RFC 7643 and RFC 7644
+- NIST SP 800-63B (digital identity guidelines)
+- NIST RBAC model (INCITS 359)
 
-Guides and references
+**Vendor documentation**
+
 - Microsoft AD DS and Group Policy documentation
-- OpenLDAP Administrator’s Guide
-- NIST RBAC model and standards
-- CNCF: Kubernetes RBAC docs
-- Cloud provider IAM docs (AWS, Azure, GCP)
+- OpenLDAP Administrator's Guide
+- Kubernetes RBAC documentation
+- AWS, Microsoft Entra ID, and Google Cloud IAM documentation
 
-Exercises to master
-- Build a small LDAP directory, secure with TLS, integrate SSSD.
-- Stand up a test AD domain; implement AGDLP and LAPS; test Kerberos SPN and KCD.
-- Configure an OIDC app (Authorization Code + PKCE); protect an API; add Conditional Access.
-- Engineer a role taxonomy; implement in directory groups and app RBAC; run an access review.
+**Exercises to master the material**
+
+- Build a small LDAP directory, secure it with TLS, and integrate it with SSSD.
+- Set up a test AD domain. Implement AGDLP, Windows LAPS, and Kerberos constrained delegation.
+- Configure an OIDC application with authorization code and PKCE. Protect an API. Add conditional access.
+- Design a role taxonomy. Implement it in directory groups and application RBAC. Run an access review.
